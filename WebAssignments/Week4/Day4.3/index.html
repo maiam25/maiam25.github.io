@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadratic Formula Calculator</title>
+    <style>
+        body {background-color: rgb(255, 233, 248);
+        }
+        h1{    color: rgb(189, 62, 125);
+        }
+        h3{
+                color: rgb(189, 62, 125);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        button{
+                color: rgb(189, 62, 125);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(255, 214, 252);
+    
+            }
+        label{      color: rgb(189, 62, 125);
+                    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                    font-size: large;
+                    font-weight: 600;
+        }
+        input{
+            color: rgb(189, 62, 125);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 240, 254);
+        }
+    </style>
+</head>
+<body>
+    <h1> Quadratic Formula Calculator</h1>
+    
+    <img src="pretty.jpg" width="200">
+    <img src="emoji2.jpg" width="200">
+    <br>
+    <br>
+        <label>Value of A</label>
+        <br>
+        <input id="inputA" value ="1"></input>
+        <br>
+        <label>Value of B</label>
+        <br>
+        <input id="inputB"value ="3"></input>
+        <br>
+        <label>Value of C  </label>
+        <br>
+        <input id="inputC"value ="-4"></input>
+        <br>
+        <br>
+        <button onclick="calc()"> Calculate</button>
+        <h3 id="output"></h3>
+    <script>
+        function calc() {
+        //read in values from text boxes
+        let valA = document.getElementById("inputA").value;
+        let valB = document.getElementById("inputB").value;
+        let valC = document.getElementById("inputC").value;
+        //test that reading values was successful
+        console.log(valA);
+        console.log(valB);
+        console.log(valC);
+        //parse to munber including decimals
+        a = parseFloat(valA);
+        b = parseFloat(valB);
+        c = parseFloat(valC);
+        //test numeric values are assigned
+        console.log(`This is the a value: ${a}`);
+        console.log(`This is the b value: ${b}`);
+        console.log(`This is the c value: ${c}`);
+
+        let underRoot = b**2-4*a*c;
+        //test underroot
+        console.log(`The calculations under the square root sign result in: ${underRoot}`);
+        let sqRoot = Math.sqrt(underRoot);
+        //test sqRoot
+        console.log(`The square root of ${underRoot} is: ${sqRoot}`);
+        let posNumer = -b+sqRoot; 
+        let negNumer = -b-sqRoot;
+        //test positive and negative numerators
+        console.log(`The positive numerator is: ${posNumer}`);
+        console.log(`The negative numerator is: ${negNumer}`);
+        let demominator = 2*a;
+        let posResult = posNumer/demominator;
+        let negResult = negNumer/demominator;
+        console.log(`The positive outcome is: ${posResult} and the negative outcome is: ${negResult}`);
+       
+       //document.write(`<br><br>The final answes are ${posResult} and ${negResult}.`);
+       let display = `<br><br>The final answes are ${posResult} and ${negResult}.`
+       document.getElementById("output").innerHTML = display;
+        }
+    </script>
+</body>
+</html>
