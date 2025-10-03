@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grading Assignment</title>
+     <style>
+        body {background-color: rgb(255, 233, 248);
+        }
+        h1{    color: rgb(189, 62, 125);
+        }
+        button{
+                color: rgb(189, 62, 125);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(255, 214, 252);
+    
+            }
+        input{
+            color: rgb(189, 62, 125);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 240, 254);
+        }
+    </style>
+</head>
+<body>
+    <h1> Please enter your mark:</h1>
+    <input type = "text" id ="grade">
+    <button onclick="mark()"> Mark</button>
+    <h1 id ="display"></h1>
+    <script>
+        function mark () {
+            let percent = parseFloat(document.getElementById("grade").value)
+            let letter = "";
+            if (percent ==100) {
+                letter = "PERFECT SCORE! AYYYYY"
+            }
+            else if (percent >=90) {
+                letter = "A+.. Nice j*b! "
+            }
+            else if (percent >=80) {
+                letter = "A.. ayyy"
+            }
+            else if (percent >=70) {
+                letter = "B... B for Better luck next time"
+            }
+            else if (percent >=60) {
+                letter = "C... 4 hours of reels and 2 minutes of studying wasn't your best shot"
+            }
+            else if (percent >=50) {
+                letter = "D... you'll be lucky if you manage to get this one signed..."
+            }
+            else {
+                letter = " ...fail"
+            }
+
+        let display = `Since you achieved a mark of ${percent}%, your grade is a ${letter}.`
+        document.getElementById("display").innerHTML=display;
+        }
+        
+    </script>
+</body>
+</html>
