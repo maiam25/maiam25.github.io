@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Price</title>
+     <style>
+        body {background-color: rgb(255, 238, 250);
+        }
+        h1{    color: rgb(165, 46, 119);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+        h2{    color: rgb(189, 62, 125);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+        h3{    color: rgb(189, 62, 125);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+        button{
+                color: rgb(189, 62, 125);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(255, 214, 252);
+   
+            }
+        input{
+            color: rgb(189, 62, 125);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 240, 254);
+        }
+        label{
+            color: rgb(189, 62, 125);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 240, 254);
+        }
+    </style>
+</head>
+<body>
+    <img src="ticket.jpg" width="200">
+    <h1>Ticket Price Calculator</h1>
+    <h2> Please select your gender:</h2>
+    <label>
+    <input type="radio" id="male" name="gender" value="Male"> Male
+  </label><br>
+  <label>
+    <input type="radio" id="female" name="gender" value="Female"> Female
+  </label><br><br>
+  <h2> Please enter your age:</h2>
+  <label>
+    <input type="text" id="age">
+  </label><br><br>
+  <br>
+  <button onclick="getPrice()">Calculate Ticket Price</button>
+  <br>
+  <h3 id="result"></h3>
+
+
+  <script>
+    function getPrice() {
+      // Get selected gender and age
+      let selected = document.querySelector('input[name="gender"]:checked');
+      let strAge = document.getElementById("age").value;
+      let age = parseInt(strAge);
+
+
+
+
+      // Calculate base price
+      let price;
+      if (age >= 18) {
+        price = 21;
+            if (selected.value === "Female") {
+            price = price * 0.75;
+        }
+      }
+
+
+      else if (age >= 12) {
+        price = 14;
+        if (selected.value === "Female") {
+            price = price * 0.75;
+        }
+      }
+      else {
+        price = 7;
+            if (selected.value === "Female") {
+            price = price * 0.75;
+            }
+      }
+
+
+
+
+      // Display result
+      document.getElementById("result").innerHTML =
+        `Gender: ${selected.value} <br> Age: ${age} <br> Your Ticket Price is: $${price.toFixed(2)}`;
+    }
+  </script>
+</body>
+
+
+</html>

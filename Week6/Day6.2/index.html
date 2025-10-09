@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <style>
+        body {background-color: rgb(220, 220, 255);
+        }
+        h1{    color: rgb(55, 43, 219);
+        }
+        button{
+                color: rgb(55, 43, 219);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(237, 237, 255);
+   
+            }
+        option{
+            color: rgb(55, 43, 219);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(220, 220, 255);
+        }
+        label{
+            color: rgb(55, 43, 219);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(220, 220, 255);
+        }
+        select{
+            color: rgb(55, 43, 219);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(242, 242, 255);
+        }
+    </style>
+</head>
+<body>
+    <h1>Display Country Flags!</h1>
+    <br>
+    <label for="country">Select a country:</label>
+    <select id="country" name="country">
+  <option value="canada">Canada</option>
+  <option value="india">India</option>
+  <option value="china">China</option>
+  <option value="usa">USA</option>
+  <option value="italy">Italy</option>
+  
+ 
+</select>
+    <br><br><br><br>
+    <br>
+    <button onclick="selectFlag()">Submit!</button>
+    <div id="flagContainer" style="margin-top:20px;"></div>
+    
+    <script>
+        function selectFlag() {
+            let country = document.getElementById("country").value;
+            let flag = document.getElementById("flagContainer");
+            flag.innerHTML ="";
+            let img = document.createElement("img");
+            img.width = 450;
+            if (country == "canada") {
+                img.src ="Canada.jpg";
+            } else if (country == "india") {
+                img.src ="India.jpg"
+            } else if (country =="china") {
+                img.src="China.jpg"
+            } else if (country =="usa") {
+                img.src="USA.jpg"
+            } else if (country =="italy") {
+                img.src="Italy.jpg"
+            }
+            flag.appendChild(img);
+        }
+    </script>
+</body>
+</html>
+</html>
