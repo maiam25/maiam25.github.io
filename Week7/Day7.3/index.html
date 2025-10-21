@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+        <style>
+        body {background-color: rgb(255, 214, 176);
+        }
+        h1{    color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-variant:unset;
+        }
+        button{
+                color: rgb(187, 52, 10);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(255, 119, 41);
+   
+            }
+        input{
+            color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 237, 220);
+        }
+        #last-number, #count, #total, #average{
+            color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tally and Average program</h1>
+    <button onclick="generateNumber()">Generate Random Number</button>
+    <p id ="last-number">Last generated number : N/A</p>
+    <p id ="count">Count : 0</p>
+    <p id ="total">Total : 0</p>
+    <p id ="average">Average : N/A</p>
+    <p id ="message" style="color: red; font-weight: bold;"></p>
+    <script>
+        let total =0;
+        let count =0;
+        const maxCount = 10;
+        function generateNumber() {
+            if (count >= maxCount) {
+                document.getElementById("message").textContent = "Stop! You've reached max.";
+                document.getElementById("generateNumber").disabled = true;
+                return;
+            }
+        const RN = Math.floor(Math.random() *10) +1;
+        total += RN;
+        count++;
+        const average = total / count;
+        document.getElementById("last-number").textContent = `Last generated number: ${RN}`;
+        document.getElementById("count").textContent = `Count: ${count}`;
+        document.getElementById("total").textContent = `Total: ${total}`;
+        document.getElementById("average").textContent = `Average: ${average.toFixed(2)}`;
+        document.getElementById("message").textContent = "";
+        }
+    </script>
+</body>
+</html>

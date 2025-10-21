@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HighLow</title>
+    <style>
+        body {background-color: rgb(255, 214, 176);
+        }
+        h1{    color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-variant:unset;
+        }
+        button{
+                color: rgb(187, 52, 10);
+                font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                font-size: large;
+                font-weight: 600;
+                background-color: rgb(255, 119, 41);
+   
+            }
+        input{
+            color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+            background-color: rgb(255, 237, 220);
+        }
+        #message{
+            color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+        }
+        #attempts{
+            color: rgb(187, 52, 10);
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: large;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Generated Number</h1>
+    <img src="pumpkincat.jpg" width="200">
+    <br>
+    <br>
+    <button onclick="Generate()">Generate Random Number</button> 
+    <br>
+    <br>
+    <br>
+    <input type="number" id="guessInput" placeholder="Enter your guess (1-100)" disabled>
+    <button onclick="checkGuess()" id="guessButton" disabled>Guess</button>
+    <p id="attempts"></p>
+    <p id="message"></p>
+    <script>
+    let secretNumber;
+    let attempsLeft = 5;
+    let gameActive = false;
+    function Generate() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            gameActive = true;
+            attemptsLeft = 5;
+            document.getElementById("message").textContent = "Number generated. Start Game.";
+            document.getElementById("attempts").textContent = "Attempts left: " + attemptsLeft;
+            document.getElementById("guessInput").disabled = false;
+            document.getElementById("guessButton").disabled = false;
+            document.getElementById("guessInput").value = "";
+        }
+        function checkGuess() {
+            if (!gameActive) {
+                document.getElementById("message").textContent = "Please generate a number first.";
+                return;
+            }
+            const userGuess = parseInt(document.getElementById("guessInput").value);
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                document.getElementById("message").textContent = "Please enter a valid number between 1 and 10.";
+                return;
+            }
+            attemptsLeft--;
+            if (userGuess === secretNumber) {
+                document.getElementById("message").textContent = "Congratulations! You've guessed the number!";
+                gameActive = false;
+                document.getElementById("guessInput").disabled = true;
+                document.getElementById("guessButton").disabled = true;
+            } else if (attemptsLeft > 0) {
+                document.getElementById("message").textContent = userGuess < secretNumber ? "Too low! Try again." : "Too high! Try again.";
+                document.getElementById("attempts").textContent = "Attempts left: " + attemptsLeft;
+            } else {
+                document.getElementById("message").textContent = "Game over! The number was " + secretNumber + ".";
+                gameActive = false;
+                document.getElementById("guessInput").disabled = true;
+                document.getElementById("guessButton").disabled = true;
+            }
+        }
+
+    </script>
+</body>
+</html>
