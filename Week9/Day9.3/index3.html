@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Student Marks with Boosted Scores</h1>
+    <table id="results" border="1">
+        <tr>
+            <th>Student</th>
+            <th>Original Mark</th>
+            <th>Boosted Mark</th>
+        </tr>
+    </table>
+    <script>
+
+    let marks = [55, 67, 45, 89, 72, 38, 91, 60, 77, 84];
+    let boosted = marks.map(function(mark) {
+      let newMark = mark + 5;
+      return newMark > 100 ? 100 : newMark;
+    });
+
+    // Display table
+let table= document.getElementById("results");
+for (let i = 0; i < marks.length; i++) {
+    let row = `<tr><td>${i + 1}</td><td>${marks[i]}</td><td>${boosted[i]}</td></tr>`;
+    table.innerHTML += row;
+}
+
+    // let table = document.getElementById("results");
+    // for (let i = 0; i < marks.length; i++) {
+    //   let row = table.insertRow();
+    //   let cell1 = row.insertCell(0);
+    //   let cell2 = row.insertCell(1);
+    //   let cell3 = row.insertCell(2);
+    //   cell1.textContent = i + 1;
+    //   cell2.textContent = marks[i];
+    //   cell3.textContent = boosted[i];
+    // }
+
+
+    // Display both tables
+    let beforeTable = document.getElementById("beforeTable");
+    let afterTable = document.getElementById("afterTable");
+
+
+
+    for (let i = 0; i < marks.length; i++) {
+      beforeTable.innerHTML += "<tr><td>" + marks[i] + "</td></tr>";
+      afterTable.innerHTML += "<tr><td>" + boosted[i] + "</td></tr>";
+    }
+
+  </script>
+
+</body>
+</html>

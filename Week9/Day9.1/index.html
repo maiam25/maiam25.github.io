@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Random Fruit Picker</h1>
+    <h2>possible fruits:</h2>
+    <ul>
+        <li>apple</li>
+        <img src="apple.jpg" width="200">
+        <li>banana</li>
+        <img src="banana.jpg" width="50">
+        <li>cherry</li>
+        <img src="cherry.jpg" width="50">
+        <li>orange</li>
+        <img src="orange.jpg" width="50">
+        <li>watermelon</li>
+        <img src="watermelon.jpg" width="50">
+        <li>pineapple</li>
+        <img src="pineapple.jpg" width="200">
+        <li>grape</li>
+        <img src="grape.jpg" width="200">
+        <li>strawberry</li>
+        <img src="strawberry.jpg" width="200">
+        <li>peach</li>
+        <img src="peach.jpg" width="200">
+        <li>mango</li>
+        <img src="mango.jpg" width="200">
+    </ul>
+    <button onclick="pickWinner()">Pick a Fruit</button>
+    <div id="result"></div>
+    <script>
+        let f1= "apple";
+        let f2= "banana";
+        let f3= "cherry";
+        let f4= "orange";
+        let f5= "watermelon";
+        let f6= "pineapple";
+        let f7= "grape";
+        let f8= "strawberry";
+        let f9= "peach";
+        let f10= "mango";   
+        let fruits= [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10];
+
+       function pickWinner() {
+           let rn = Math.floor(Math.random() * 10);
+           let output= `<h1>The winner is ${fruits[rn]}!</h1>`;
+           document.getElementById("result").innerHTML = output;
+       }
+    </script>
+</body>
+</html>
