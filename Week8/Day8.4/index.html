@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert While Loop to For Loop</title>
+</head>
+<style>
+        body {
+            background-color: rgb(255, 238, 250);
+        }
+        h1{    color: rgb(165, 46, 119);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+        h2{    color: rgb(189, 62, 125);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+</style>
+<body>
+    <h1>Convert While Loop to For Loop</h1>
+    <h2 id="resultMAvg"></h2>
+    <h2 id="resultFAvg"></h2>
+<script>
+
+
+  let gender = prompt("Please enter gender", "M or F or f to finish");
+  let tallyM = 0;
+  let tallyG = 0;
+  let mark = 0;
+  let countM = 0;
+  let countG = 0;
+
+  while (gender != 'f' && gender != 'F') {
+    mark = parseFloat(prompt("Please enter mark"));
+
+    if (gender == 'M' || gender == 'm') {
+      tallyM += mark;
+      countM++;
+    }
+    else if (gender == 'F' || gender == 'f') {
+      tallyG += mark;
+      countG++;
+    }
+    else {
+      alert("Invalid input. Please enter M, F, or f to finish.");
+    }
+
+    gender = prompt("Please enter gender", "M or F or f to finish");
+  }
+
+    let MAvg = tallyM / countM;
+    let GAvg = tallyG / countG;
+    let TAvg = (tallyM + tallyG) / (countM + countG);
+
+//   document.write("Male Average: " + MAvg.toFixed(2) + "<br>");
+//   document.write("Female Average: " + GAvg.toFixed(2) + "<br>");
+
+   document.getElementById("resultMAvg").innerHTML =
+        `Male Average: ${MAvg.toFixed(2)}`;
+   document.getElementById("resultFAvg").innerHTML =
+        `Female Average: ${GAvg.toFixed(2)}`;
+   document.getElementById("resultTAvg").innerHTML =
+        `Total Average: ${TAvg.toFixed(2)}`;
+
+</script>
+</body>
+</html>
