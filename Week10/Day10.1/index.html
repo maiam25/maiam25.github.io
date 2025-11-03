@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(154, 255, 187);
+        }
+        h1{    color: rgb(0, 128, 64);
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+
+    </style>
+</head>
+<body>
+    <h1> Push() - Add to End</h1>
+    <script>
+        // array.push(element);  // Syntax example
+        let fruits = ["Apple", "Banana", "Orange"];
+        fruits.push("Mango");
+        document.write(fruits);
+    </script>
+    <h1> pop() - Remove from End</h1>
+    <script>
+        // array.pop();  // Syntax example
+        let vegetables = ["Carrot", "Potato", "Tomato", "Cucumber"];
+        vegetables.pop();
+        document.write(vegetables);
+    </script>
+    <h1> unshift() - Add to Beginning</h1>
+    <script>
+        // array.unshift(element);  // Syntax example
+        let clothes = ["Shirt", "Pants", "Jacket"];
+        clothes.unshift("Hat");
+        document.write(clothes);
+    </script>
+    <h1> shift() - Remove from Beginning</h1>
+    <script>
+        // array.shift();  // Syntax example
+        let colors = ["Red", "Blue", "Green", "Yellow"];
+        colors.shift();
+        document.write(colors); 
+    </script>
+    <h1>indexOf() - Find Position</h1>
+    <script>
+        // array.indexOf(element);  // Syntax example
+        let nuts = ["Peanut", "Cashew", "Pistachio"];
+        let position = nuts.indexOf("Cashew");
+        document.write(position);
+    </script>
+    <h1>includes() - Check Existence</h1>
+    <script>
+        // array.includes(element);  // Syntax example
+        let drinks = ["Water", "Juice", "Tea"];
+        let exists = drinks.includes("Juice");
+        document.write(exists);
+    </script>
+    <h1>slice() - Copy a Portion</h1>
+    <script>    
+        // array.slice(start, end);  // Syntax example
+        let cities = ["Rome", "Amsterdam", "Paris", "Bern"];
+        let citrus = cities.slice(1, 3);
+        document.write(citrus);
+    </script>
+    <h1>map() - Transform Elements</h1>
+    <script>
+        // array.map(function(element){return newValue;});  // Syntax example
+        let nums = [1, 2, 3, 4];
+        let doubled = nums.map(function(num){ return num * 2; });
+        document.write(doubled);
+    </script>
+    <h1>reduce() Combine into one</h1>
+    <script>
+    // array.reduce(function(accumulator, element){ return newAccumulator; }, initialValue);  // Syntax example
+        let values = [10, 20, 30];
+        let sum = values.reduce(function(total, num){ return total + num; }, 0);
+        document.write(sum);    
+    </script>
+</body>
+</html>
