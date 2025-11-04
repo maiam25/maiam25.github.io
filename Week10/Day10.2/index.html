@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countries</title>
+    <style>
+        body {
+            background-color: rgb(235, 223, 212);
+        }
+        h2 {
+            color: rgb(54, 40, 27)
+        }
+        #fileInput {
+            display: none; /* Hide the default file input */
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: rgb(54, 40, 27);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .custom-file-upload:hover {
+            background-color: rgb(80, 60, 40);
+        }
+    </style>
+</head>
+<body>
+
+
+  <h2>Select a File to Read(.txt)</h2>
+  <label for="fileInput" class="custom-file-upload">
+    Choose File
+  </label>
+  <input type="file" id="fileInput"><br><br>
+  <pre id="output"></pre>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const output = document.getElementById("output");
+    fileInput.addEventListener("change", function() {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+
+    let input = e.target.result; 
+    // Assign file contents to string variable
+    let variable = input;
+
+    output.textContent = "The variable 'input' contains:\n\n" + input;
+
+    let country = input.split(" ");
+    // Clear output and show a heading
+    output.textContent = "Countries listed one per line:\n\n";
+    // Simple for loop to output each country on a new line
+    for (let i = 0; i < country.length; i++) {
+    output.textContent += country[i] + "\n";
+        }
+
+      };
+    reader.readAsText(file);
+    });
+
+
+  </script>
+</body>
+</html>
