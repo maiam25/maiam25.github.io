@@ -9,7 +9,7 @@
             background-color: rgb(255, 224, 212);
             font-family: Arial, sans-serif;
         }
-        #myButton {
+        #myButton, #myButton2 {
             padding: 10px 20px;
             font-size: 16px;
             background-color: rgb(73, 57, 52);
@@ -18,9 +18,10 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-right: 10px;
         }
 
-        #myButton:hover {
+        #myButton:hover, #myButton2:hover {
             background-color: rgb(29, 17, 12);
         }
 
@@ -29,13 +30,40 @@
             padding: 10px;
             margin-top: 10px;
         }
+
+        #imageButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: rgb(73, 57, 52);
+            color: rgb(255, 224, 212);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #imageButton img {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        #imageButton:hover {
+            background-color: rgb(29, 17, 12);
+        }
     </style>
 </head>
 <body>
     <button id="myButton">Click me</button>
+    <button id="myButton2">Hover over me</button>
     <p id="messageArea"></p>
     <script>
         const button = document.getElementById("myButton");
+        const button2 = document.getElementById("myButton2");
         const messageArea = document.getElementById("messageArea");
         
         function showMessage() {
@@ -43,11 +71,17 @@
         }
 
         button.addEventListener("click", showMessage);
+    
         function hoverMessage() {
-        messageArea.textContent = "I have been invaded!";
-   
+            messageArea.textContent = "I have been invaded!";
         }
         button.addEventListener("mouseover", hoverMessage);
+
+        function clearMessage() {
+            messageArea.textContent = "";
+        }
+        button2.addEventListener("mouseover", clearMessage);
+
 </script>
 </body>
 </html>

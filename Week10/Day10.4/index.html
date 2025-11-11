@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+</head>
+    <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin-top: 150px;
+      background-color: #f2f2f2;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    /* Base button style */
+    #Button, #Button2, #Button3, #Button4, #Button5, #Button6, #Button7, #Button8, #Button9, #Button0, #ButtonAdd, #ButtonSubtract, #ButtonMultiply, #ButtonDivide, #ButtonEqual, #ButtonClear, #ButtonDecimal {
+      background: linear-gradient(180deg, rgb(175, 76, 153) 0%, rgb(142, 56, 142) 100%);
+      border: none;
+      color: white;
+      padding: 18px 40px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 999px;
+      transition:
+        background 0.3s ease,
+        transform 0.1s ease,
+        box-shadow 0.1s ease;
+      box-shadow: 0 6px rgb(125, 46, 114);
+    }
+
+    /* Hover effect */
+    #Button.hovered, #Button2.hovered, #Button3.hovered, #Button4.hovered, #Button5.hovered, #Button6.hovered, #Button7.hovered, #Button8.hovered, #Button9.hovered, #Button0.hovered, #ButtonAdd.hovered, #ButtonSubtract.hovered, #ButtonMultiply.hovered, #ButtonDivide.hovered, #ButtonEqual.hovered, #ButtonClear.hovered, #ButtonDecimal.hovered {
+      background: linear-gradient(180deg, rgb(187, 102, 173) 0%, rgb(160, 67, 137) 100%);
+      box-shadow: 0 8px rgba(125, 46, 114);
+    }
+
+    /* Pressed effect */
+    #Button.pressed, #Button2.pressed, #Button3.pressed, #Button4.pressed, #Button5.pressed, #Button6.pressed, #Button7.pressed, #Button8.pressed, #Button9.pressed, #Button0.pressed, #ButtonAdd.pressed, #ButtonSubtract.pressed, #ButtonMultiply.pressed, #ButtonDivide.pressed, #ButtonEqual.pressed, #ButtonClear.pressed, #ButtonDecimal.pressed {
+      transform: translateY(4px);
+      box-shadow: 0 3px rgb(125, 46, 114);
+      background: linear-gradient(180deg, rgb(199, 129, 178) 0%, rgb(172, 76, 175) 100%);
+    }
+
+    /* Flash animation for click */
+    @keyframes flash {
+      0% { background: linear-gradient(180deg, rgb(199, 129, 178) 0%, rgb(175, 76, 170) 100%); }
+      50% { background: linear-gradient(180deg, rgb(213, 165, 207) 0%, rgb(187, 102, 183) 100%); }
+      100% { background: linear-gradient(180deg, rgb(175, 76, 162) 0%, rgb(142, 56, 135) 100%); }
+    }
+
+    #Button.flash, #Button2.flash, #Button3.flash, #Button4.flash, #Button5.flash, #Button6.flash, #Button7.flash, #Button8.flash, #Button9.flash, #Button0.flash, #ButtonAdd.flash, #ButtonSubtract.flash, #ButtonMultiply.flash, #ButtonDivide.flash, #ButtonEqual.flash, #ButtonClear.flash, #ButtonDecimal.flash {
+      animation: flash 0.3s ease;
+    }
+    input[type="text"] {
+      width: 225px;
+      height: 45px;
+      font-size: 24px;
+      text-align: right;
+      margin-bottom: 20px;
+      border: 2px solid rgb(211, 168, 202);
+      border-radius: 999px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Enhanced Button Effects</h2>
+
+  <!-- Single Button -->
+  <input type="text" id="display" disabled> 
+  <button id="ButtonClear">Clear</button><br>
+  <button id="Button">1</button>
+  <button id="Button2">2</button>
+  <button id="Button3">3</button>
+  <button id="ButtonAdd">+</button><br><br>
+  <button id="Button4">4</button>
+  <button id="Button5">5</button>
+  <button id="Button6">6</button>
+  <button id="ButtonSubtract">-</button><br><br>
+  <button id="Button7">7</button>
+  <button id="Button8">8</button>
+  <button id="Button9">9</button>
+  <button id="ButtonMultiply">x</button><br><br>
+  <button id="ButtonDecimal">.</button>
+  <button id="Button0">0</button>
+  <button id="ButtonEqual">=</button>
+  <button id="ButtonDivide">÷</button>
+  
+
+  <!-- Sound effect -->
+    <audio id="clickSound" src="effect.mp3"></audio>
+    <audio id="clickSound2" src="effect.mp3"></audio>
+    <audio id="clickSound3" src="effect.mp3"></audio>
+    <audio id="clickSound4" src="effect.mp3"></audio>
+    <audio id="clickSound5" src="effect.mp3"></audio>
+    <audio id="clickSound6" src="effect.mp3"></audio>
+    <audio id="clickSound7" src="effect.mp3"></audio>
+    <audio id="clickSound8" src="effect.mp3"></audio>
+    <audio id="clickSound9" src="effect.mp3"></audio>
+    <audio id="clickSound0" src="effect.mp3"></audio>
+    <audio id="clickSoundAdd" src="effect.mp3"></audio>
+    <audio id="clickSoundSubtract" src="effect.mp3"></audio>
+    <audio id="clickSoundMultiply" src="effect.mp3"></audio>
+    <audio id="clickSoundDivide" src="effect.mp3"></audio>
+    <audio id="clickSoundClear" src="effect.mp3"></audio>
+    <audio id="clickSoundDecimal" src="effect.mp3"></audio>
+
+  <audio id="clickSoundEqual" src="effect.mp3"></audio>
+
+  <script>
+    const display = document.getElementById("display");
+    const buttons = document.querySelectorAll("button");
+  
+
+    const sound = document.querySelectorAll("[id^='clickSound']");
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        button.classList.add("pressed");
+        setTimeout(() => button.classList.remove("pressed"), 100);
+        button.classList.add("flash");
+        setTimeout(() => button.classList.remove("flash"), 300);
+      });
+    });
+    
+
+    // const clickSound2 = document.getElementById("clickSound2");
+    // const clickSound3 = document.getElementById("clickSound3");
+    // const clickSound4 = document.getElementById("clickSound4");
+    // const clickSound5 = document.getElementById("clickSound5");
+    // const clickSound6 = document.getElementById("clickSound6");
+    // const clickSound7 = document.getElementById("clickSound7");
+    // const clickSound8 = document.getElementById("clickSound8");
+    // const clickSound9 = document.getElementById("clickSound9");
+    // const clickSound0 = document.getElementById("clickSound0");
+    // const clickSoundAdd = document.getElementById("clickSoundAdd");
+    // const clickSoundSubtract = document.getElementById("clickSoundSubtract");
+    // const clickSoundMultiply = document.getElementById("clickSoundMultiply");
+    // const clickSoundDivide = document.getElementById("clickSoundDivide");
+    // const clickSoundEqual = document.getElementById("clickSoundEqual");
+    // const clickSoundClear = document.getElementById("clickSoundClear");
+    // const clickSoundDecimal = document.getElementById("clickSoundDecimal");
+
+    // Mouse over
+    buttons.forEach(button => {
+      button.addEventListener("mouseover", function() {
+        button.classList.add("hovered");
+      });
+    });
+    // button3.addEventListener("mouseover", function() {
+    //   button3.classList.add("hovered");
+    // });
+    // button4.addEventListener("mouseover", function() {
+    //   button4.classList.add("hovered");
+    // });
+    // button5.addEventListener("mouseover", function() {
+    //   button5.classList.add("hovered");
+    // });
+    // button6.addEventListener("mouseover", function() {
+    //   button6.classList.add("hovered");
+    // });
+    // button7.addEventListener("mouseover", function() {
+    //   button7.classList.add("hovered");
+    // });
+    // button8.addEventListener("mouseover", function() {
+    //   button8.classList.add("hovered");
+    // });
+    // button9.addEventListener("mouseover", function() {
+    //   button9.classList.add("hovered");
+    // });
+    // button0.addEventListener("mouseover", function() {
+    //   button0.classList.add("hovered");
+    // });
+    // buttonAdd.addEventListener("mouseover", function() {
+    //   buttonAdd.classList.add("hovered");
+    // });
+    // buttonSubtract.addEventListener("mouseover", function() {
+    //   buttonSubtract.classList.add("hovered");
+    // });
+    // buttonMultiply.addEventListener("mouseover", function() {
+    //   buttonMultiply.classList.add("hovered");
+    // });
+    // buttonDivide.addEventListener("mouseover", function() {
+    //   buttonDivide.classList.add("hovered");
+    // });
+    // buttonEqual.addEventListener("mouseover", function() {
+    //   buttonEqual.classList.add("hovered");
+    // });
+    // buttonClear.addEventListener("mouseover", function() {
+    //   buttonClear.classList.add("hovered");
+    // });
+    // buttonDecimal.addEventListener("mouseover", function() {
+    //   buttonDecimal.classList.add("hovered");
+    // });
+
+    // Mouse out
+    buttons.forEach(button => {
+      button.addEventListener("mouseout", function() {
+        button.classList.remove("hovered");
+      });
+    });
+    //   button3.classList.remove("hovered");
+    // });
+    // button4.addEventListener("mouseout", function() {
+    //   button4.classList.remove("hovered");
+    // });
+    // button5.addEventListener("mouseout", function() {
+    //   button5.classList.remove("hovered");
+    // });
+    // button6.addEventListener("mouseout", function() {
+    //   button6.classList.remove("hovered");
+    // });
+    // button7.addEventListener("mouseout", function() {
+    //   button7.classList.remove("hovered");
+    // });
+    // button8.addEventListener("mouseout", function() {
+    //   button8.classList.remove("hovered");
+    // });
+    // button9.addEventListener("mouseout", function() {
+    //   button9.classList.remove("hovered");
+    // });
+    // button0.addEventListener("mouseout", function() {
+    //   button0.classList.remove("hovered");
+    // });
+    // buttonAdd.addEventListener("mouseout", function() {
+    //   buttonAdd.classList.remove("hovered");
+    // });
+    // buttonSubtract.addEventListener("mouseout", function() {
+    //   buttonSubtract.classList.remove("hovered");
+    // });
+    // buttonMultiply.addEventListener("mouseout", function() {
+    //   buttonMultiply.classList.remove("hovered");
+    // });
+    // buttonDivide.addEventListener("mouseout", function() {
+    //   buttonDivide.classList.remove("hovered");
+    // });
+    // buttonEqual.addEventListener("mouseout", function() {
+    //   buttonEqual.classList.remove("hovered");
+    // });
+    // buttonClear.addEventListener("mouseout", function() {
+    //   buttonClear.classList.remove("hovered");
+    // });
+    // buttonDecimal.addEventListener("mouseout", function() {
+    //   buttonDecimal.classList.remove("hovered");
+    // });
+
+    // Mouse down (pressed)
+    buttons.forEach(function(button, index) {
+      button.addEventListener("mousedown", function() {
+        button.classList.add("pressed");
+        clickSounds[index].currentTime = 0; // rewind sound
+        clickSounds[index].play();          // play sound
+      });
+    });
+    // button2.addEventListener("mousedown", function() {
+    //   button2.classList.add("pressed");
+    //   clickSound2.currentTime = 0; // rewind sound
+    //   clickSound2.play();          // play sound
+    // });
+    //  button3.addEventListener("mousedown", function() {
+    //   button3.classList.add("pressed");
+    //   clickSound3.currentTime = 0; // rewind sound
+    //   clickSound3.play();          // play sound
+    // });
+    // button4.addEventListener("mousedown", function() {
+    //   button4.classList.add("pressed");
+    //   clickSound4.currentTime = 0; // rewind sound
+    //   clickSound4.play();          // play sound
+    // });
+    // button5.addEventListener("mousedown", function() {
+    //   button5.classList.add("pressed");
+    //   clickSound5.currentTime = 0; // rewind sound
+    //   clickSound5.play();          // play sound
+    // });
+    // button6.addEventListener("mousedown", function() {
+    //   button6.classList.add("pressed");
+    //   clickSound6.currentTime = 0; // rewind sound
+    //   clickSound6.play();          // play sound
+    // });
+    // button7.addEventListener("mousedown", function() {
+    //   button7.classList.add("pressed");
+    //   clickSound7.currentTime = 0; // rewind sound
+    //   clickSound7.play();          // play sound
+    // });
+    // button8.addEventListener("mousedown", function() {
+    //   button8.classList.add("pressed");
+    //   clickSound8.currentTime = 0; // rewind sound
+    //   clickSound8.play();          // play sound
+    // });
+    // button9.addEventListener("mousedown", function() {
+    //   button9.classList.add("pressed");
+    //   clickSound9.currentTime = 0; // rewind sound
+    //   clickSound9.play();          // play sound
+    // });
+    // button0.addEventListener("mousedown", function() {
+    //   button0.classList.add("pressed");
+    //   clickSound0.currentTime = 0; // rewind sound
+    //   clickSound0.play();          // play sound
+    // });
+    // buttonAdd.addEventListener("mousedown", function() {
+    //   buttonAdd.classList.add("pressed");
+    //   clickSoundAdd.currentTime = 0; // rewind sound
+    //   clickSoundAdd.play();          // play sound
+    // });
+    // buttonSubtract.addEventListener("mousedown", function() {
+    //   buttonSubtract.classList.add("pressed");
+    //   clickSoundSubtract.currentTime = 0; // rewind sound
+    //   clickSoundSubtract.play();          // play sound
+    // });
+    // buttonMultiply.addEventListener("mousedown", function() {
+    //   buttonMultiply.classList.add("pressed");
+    //   clickSoundMultiply.currentTime = 0; // rewind sound
+    //   clickSoundMultiply.play();          // play sound
+    // });
+    // buttonDivide.addEventListener("mousedown", function() {
+    //   buttonDivide.classList.add("pressed");
+    //   clickSoundDivide.currentTime = 0; // rewind sound
+    //   clickSoundDivide.play();          // play sound
+    // });
+    // buttonEqual.addEventListener("mousedown", function() {
+    //   buttonEqual.classList.add("pressed");
+    //   clickSoundEqual.currentTime = 0; // rewind sound
+    //   clickSoundEqual.play();          // play sound
+    // });
+    // buttonClear.addEventListener("mousedown", function() {
+    //   buttonClear.classList.add("pressed");
+    //   clickSoundClear.currentTime = 0; // rewind sound
+    //   clickSoundClear.play();          // play sound
+    // });
+    // buttonDecimal.addEventListener("mousedown", function() {
+    //   buttonDecimal.classList.add("pressed");
+    //   clickSoundDecimal.currentTime = 0; // rewind sound
+    //   clickSoundDecimal.play();          // play sound
+    // });
+
+    // Mouse up (release)
+    buttons.forEach(button => {
+      button.addEventListener("mouseup", function() {
+        button.classList.remove("pressed");
+        button.classList.add("flash");
+        setTimeout(() => button.classList.remove("flash"), 300);
+      });
+    });
+    // button2.addEventListener("mouseup", function() {
+    //   button2.classList.remove("pressed");
+    //   button2.classList.add("flash");
+    //   setTimeout(() => button2.classList.remove("flash"), 300);
+    // });
+    //  button3.addEventListener("mouseup", function() {
+    //   button3.classList.remove("pressed");
+    //   button3.classList.add("flash");
+    //   setTimeout(() => button3.classList.remove("flash"), 300);
+    // });
+    // button4.addEventListener("mouseup", function() {
+    //   button4.classList.remove("pressed");
+    //   button4.classList.add("flash");
+    //   setTimeout(() => button4.classList.remove("flash"), 300);
+    // });
+    // button5.addEventListener("mouseup", function() {
+    //   button5.classList.remove("pressed");
+    //   button5.classList.add("flash");
+    //   setTimeout(() => button5.classList.remove("flash"), 300);
+    // });
+    // button6.addEventListener("mouseup", function() {
+    //   button6.classList.remove("pressed");
+    //   button6.classList.add("flash");
+    //   setTimeout(() => button6.classList.remove("flash"), 300);
+    // });
+    // button7.addEventListener("mouseup", function() {
+    //   button7.classList.remove("pressed");
+    //   button7.classList.add("flash");
+    //   setTimeout(() => button7.classList.remove("flash"), 300);
+    // });
+    // button8.addEventListener("mouseup", function() {
+    //   button8.classList.remove("pressed");
+    //   button8.classList.add("flash");
+    //   setTimeout(() => button8.classList.remove("flash"), 300);
+    // });
+    // button9.addEventListener("mouseup", function() {
+    //   button9.classList.remove("pressed");
+    //   button9.classList.add("flash");
+    //   setTimeout(() => button9.classList.remove("flash"), 300);
+    // });
+    // button0.addEventListener("mouseup", function() {
+    //   button0.classList.remove("pressed");
+    //   button0.classList.add("flash");
+    //   setTimeout(() => button0.classList.remove("flash"), 300);
+    // });
+    // buttonAdd.addEventListener("mouseup", function() {
+    //   buttonAdd.classList.remove("pressed");
+    //   buttonAdd.classList.add("flash");
+    //   setTimeout(() => buttonAdd.classList.remove("flash"), 300);
+    // });
+    // buttonSubtract.addEventListener("mouseup", function() {
+    //   buttonSubtract.classList.remove("pressed");
+    //   buttonSubtract.classList.add("flash");
+    //   setTimeout(() => buttonSubtract.classList.remove("flash"), 300);
+    // });
+    // buttonMultiply.addEventListener("mouseup", function() {
+    //   buttonMultiply.classList.remove("pressed");
+    //   buttonMultiply.classList.add("flash");
+    //   setTimeout(() => buttonMultiply.classList.remove("flash"), 300);
+    // });
+    // buttonDivide.addEventListener("mouseup", function() {
+    //   buttonDivide.classList.remove("pressed");
+    //   buttonDivide.classList.add("flash");
+    //   setTimeout(() => buttonDivide.classList.remove("flash"), 300);
+    // });
+    // buttonEqual.addEventListener("mouseup", function() {
+    //   buttonEqual.classList.remove("pressed");
+    //   buttonEqual.classList.add("flash");
+    //   setTimeout(() => buttonEqual.classList.remove("flash"), 300);
+    // });
+    // buttonClear.addEventListener("mouseup", function() {
+    //   buttonClear.classList.remove("pressed");
+    //   buttonClear.classList.add("flash");
+    //   setTimeout(() => buttonClear.classList.remove("flash"), 300);
+    // });
+    // buttonDecimal.addEventListener("mouseup", function() {
+    //   buttonDecimal.classList.remove("pressed");
+    //   buttonDecimal.classList.add("flash");
+    //   setTimeout(() => buttonDecimal.classList.remove("flash"), 300);
+    // });
+
+    // Calculator logic
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const value = button.textContent;
+
+        if (value === "Clear") {
+          display.value = "";
+        } else if (value === "=") {
+          try {
+            display.value = eval(display.value.replace('x', '*').replace('÷', '/'));
+          } catch {
+            display.value = "Error";
+          }
+        } else {
+          display.value += value;
+        }
+      });
+    });
+
+  </script>
+
+</body>
+</html>

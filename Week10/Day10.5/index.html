@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+</head>
+    <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin-top: 150px;
+      background-color: rgb(232, 255, 242);
+    }
+
+    h1 {
+      color: rgb(15, 100, 67);
+    }
+
+    /* Base button style */
+    #Button, #Button2, #Button3, #Button4, #Button5, #Button6, #Button7, #Button8, #Button9, #Button0, #ButtonAdd, #ButtonSubtract, #ButtonMultiply, #ButtonDivide, #ButtonEqual, #ButtonClear, #ButtonDecimal {
+      background: linear-gradient(180deg, rgb(76, 175, 109) 0%, rgb(56, 142, 106) 100%);
+      border: none;
+      color: white;
+      padding: 18px 40px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 999px;
+      transition:
+        background 0.3s ease,
+        transform 0.1s ease,
+        box-shadow 0.1s ease;
+      box-shadow: 0 6px rgb(46, 125, 82);
+    }
+
+    /* Hover effect */
+    #Button.hovered, #Button2.hovered, #Button3.hovered, #Button4.hovered, #Button5.hovered, #Button6.hovered, #Button7.hovered, #Button8.hovered, #Button9.hovered, #Button0.hovered, #ButtonAdd.hovered, #ButtonSubtract.hovered, #ButtonMultiply.hovered, #ButtonDivide.hovered, #ButtonEqual.hovered, #ButtonClear.hovered, #ButtonDecimal.hovered {
+      background: linear-gradient(180deg, rgb(102, 187, 127) 0%, rgb(67, 160, 109) 100%);
+      box-shadow: 0 8px rgb(46, 125, 88);
+    }
+
+    /* Pressed effect */
+    #Button.pressed, #Button2.pressed, #Button3.pressed, #Button4.pressed, #Button5.pressed, #Button6.pressed, #Button7.pressed, #Button8.pressed, #Button9.pressed, #Button0.pressed, #ButtonAdd.pressed, #ButtonSubtract.pressed, #ButtonMultiply.pressed, #ButtonDivide.pressed, #ButtonEqual.pressed, #ButtonClear.pressed, #ButtonDecimal.pressed {
+      transform: translateY(4px);
+      box-shadow: 0 3px rgb(46, 125, 85);
+      background: linear-gradient(180deg, rgb(129, 199, 146) 0%, rgb(76, 175, 120) 100%);
+    }
+
+    /* Flash animation for click */
+    @keyframes flash {
+      0% { background: linear-gradient(180deg, rgb(129, 199, 164) 0%, rgb(76, 175, 120) 100%); }
+      50% { background: linear-gradient(180deg, rgb(165, 213, 181) 0%, rgb(102, 187, 127) 100%); }
+      100% { background: linear-gradient(180deg, rgb(76, 175, 125) 0%, rgb(56, 142, 99) 100%); }
+    }
+
+    #Button.flash, #Button2.flash, #Button3.flash, #Button4.flash, #Button5.flash, #Button6.flash, #Button7.flash, #Button8.flash, #Button9.flash, #Button0.flash, #ButtonAdd.flash, #ButtonSubtract.flash, #ButtonMultiply.flash, #ButtonDivide.flash, #ButtonEqual.flash, #ButtonClear.flash, #ButtonDecimal.flash {
+      animation: flash 0.3s ease;
+    }
+    input[type="text"] {
+      width: 225px;
+      height: 45px;
+      font-size: 24px;
+      text-align: right;
+      margin-bottom: 20px;
+      border: 2px solid rgb(168, 211, 182);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background-color: rgb(255, 255, 255);
+      color: rgb(15, 100, 65);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Calculator</h1>
+
+  <!-- Single Button -->
+  <input type="text" id="display" disabled> 
+  <button id="ButtonClear">Clear</button><br>
+  <button id="Button">1</button>
+  <button id="Button2">2</button>
+  <button id="Button3">3</button>
+  <button id="ButtonAdd">+</button><br><br>
+  <button id="Button4">4</button>
+  <button id="Button5">5</button>
+  <button id="Button6">6</button>
+  <button id="ButtonSubtract">-</button><br><br>
+  <button id="Button7">7</button>
+  <button id="Button8">8</button>
+  <button id="Button9">9</button>
+  <button id="ButtonMultiply">x</button><br><br>
+  <button id="ButtonDecimal">.</button>
+  <button id="Button0">0</button>
+  <button id="ButtonEqual">=</button>
+  <button id="ButtonDivide">÷</button>
+  
+
+  <!-- Sound effect -->
+    <audio id="clickSound" src="click.mp3"></audio>
+    <audio id="clickSound2" src="click.mp3"></audio>
+    <audio id="clickSound3" src="click.mp3"></audio>
+    <audio id="clickSound4" src="click.mp3"></audio>
+    <audio id="clickSound5" src="click.mp3"></audio>
+    <audio id="clickSound6" src="click.mp3"></audio>
+    <audio id="clickSound7" src="click.mp3"></audio>
+    <audio id="clickSound8" src="click.mp3"></audio>
+    <audio id="clickSound9" src="click.mp3"></audio>
+    <audio id="clickSound0" src="click.mp3"></audio>
+    <audio id="clickSoundAdd" src="click.mp3"></audio>
+    <audio id="clickSoundSubtract" src="click.mp3"></audio>
+    <audio id="clickSoundMultiply" src="click.mp3"></audio>
+    <audio id="clickSoundDivide" src="click.mp3"></audio>
+    <audio id="clickSoundClear" src="click.mp3"></audio>
+    <audio id="clickSoundDecimal" src="click.mp3"></audio>
+
+  <audio id="clickSoundEqual" src="yay.mp3"></audio>
+
+  <script>
+    const display = document.getElementById("display");
+    const buttons = document.querySelectorAll("button");
+  
+
+    const sound = document.querySelectorAll("[id^='clickSound']");
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        button.classList.add("pressed");
+        setTimeout(() => button.classList.remove("pressed"), 100);
+        button.classList.add("flash");
+        setTimeout(() => button.classList.remove("flash"), 300);
+      });
+    });
+
+    // Mouse over
+    buttons.forEach(button => {
+      button.addEventListener("mouseover", function() {
+        button.classList.add("hovered");
+      });
+    });
+
+
+    // Mouse out
+    buttons.forEach(button => {
+      button.addEventListener("mouseout", function() {
+        button.classList.remove("hovered");
+      });
+    });
+
+    // Mouse down 
+    buttons.forEach(function(button) {
+      button.addEventListener("mousedown", function() {
+        button.classList.add("pressed");
+        // Derive audio element 
+        const suffix = button.id.replace(/^Button/, "");
+        const audioId = "clickSound" + suffix;
+        const audioEl = document.getElementById(audioId);
+        if (audioEl) {
+          audioEl.currentTime = 0; // rewind
+          audioEl.play().catch(() => {
+          });
+        }
+      });
+    });
+
+    // Mouse up (release)
+    buttons.forEach(button => {
+      button.addEventListener("mouseup", function() {
+        button.classList.remove("pressed");
+        button.classList.add("flash");
+        setTimeout(() => button.classList.remove("flash"), 300);
+      });
+    });
+
+
+    // Calculator logic
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const value = button.textContent;
+
+        if (value === "Clear") {
+          display.value = "";
+        } else if (value === "=") {
+          try {
+            display.value = eval(display.value.replace('x', '*').replace('÷', '/'));
+          } catch {
+            display.value = "Error";
+          }
+        } else {
+          display.value += value;
+        }
+      });
+    });
+
+  </script>
+
+</body>
+</html>
