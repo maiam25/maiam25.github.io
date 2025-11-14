@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<h1> Student Information</h1>
+<input type="text" id="nameBox" placeholder="First Name">
+<input type="text" id="lastBox" placeholder="Last Name"><br><br>
+<input type="text" id="ageBox" placeholder="Age">
+<input type="text" id="emailBox" placeholder="Email"><br><br>
+<button onclick="write()">Add Student</button>
+    <script>
+let students =  { 
+    firstName: document.getElementById("nameBox").value, lastName: document.getElementById("lastBox").value, email: document.getElementById("emailBox").value, age: document.getElementById("ageBox").value 
+    
+    }
+    let output = `First Name: ${students.firstName}
+    Last Name: ${students.lastName}
+    Email: ${students.email}
+    Age: ${students.age}`;
+    function write() {
+        document.write(output);
+    }
+    
+    
+    //console.log(output);
+    document.write(output);
+</script>  
+</body>
+</html>
+
+
+
+ <!-- // { firstName: "Ava", lastName: "Smith", email: "avasmith@pvnccdsb.on.ca", age: 17 },
+//{ firstName: "Liam", lastName: "Brown", email: "liambrown@pvnccdsb.on.ca", age: 18 },
+//{ firstName: "Noah", lastName: "Johnson", email: "noahjohnson@pvnccdsb.on.ca", age: 17 } -->
