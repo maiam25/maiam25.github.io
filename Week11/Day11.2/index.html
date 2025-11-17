@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<h1> Student Information</h1>
+<h2>Enter Student Details</h2>
+<input type="text" id="nameBox" placeholder="First Name">
+<input type="text" id="lastBox" placeholder="Last Name"><br><br>
+<input type="text" id="ageBox" placeholder="Age">
+<input type="text" id="emailBox" placeholder="Email"><br><br>
+<button onclick="write()">Add Student</button>
+<h2>Or Select a File to Read(.txt)</h2>
+<label for="fileInput" class="custom-file-upload">Choose File
+</label>
+  <input type="file" id="fileInput"><br><br>
+  <pre id="output"></pre>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const output = document.getElementById("output");
+    fileInput.addEventListener("change", function() {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+
+    let input = e.target.result; 
+    // Assign file contents to string variable
+    let variable = input;
+
+    output.textContent = "The variable 'input' contains:\n\n" + input;
+
+    let country = input.split(" ");
+    // Clear output and show a heading
+    output.textContent = "Countries listed one per line:\n\n";
+    // Simple for loop to output each country on a new line
+    for (let i = 0; i < country.length; i++) {
+    output.textContent += country[i] + "\n";
+        }
+
+      };
+    reader.readAsText(file);
+    });
+
+let students =  { 
+    firstName: document.getElementById("nameBox").value, lastName: document.getElementById("lastBox").value, email: document.getElementById("emailBox").value, age: document.getElementById("ageBox").value 
+    
+    }
+    let writing = `First Name: ${students.firstName}
+    Last Name: ${students.lastName}
+    Email: ${students.email}
+    Age: ${students.age}`;
+    function write() {
+        document.write(writing);
+    }
+    
+    
+    //console.log(output);
+   // document.write(output);
+</script>  
+</body>
+</html>
