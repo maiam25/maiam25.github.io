@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(218, 241, 228);
+        }
+        p {
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            color: rgb(36, 131, 102);
+            font-weight: bold;
+            font-size:small;
+        }
+        #AddStudent { background:rgb(17, 170, 106); color:white; }
+        #Clearlist { background:rgb(220, 73, 53); color:white; }
+        #Clearinfo { background:rgb(220, 73, 53); color:white; }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }   
+        #AddStudent:hover {
+            filter: brightness(1.05);
+        }
+        #Clearlist:hover, #Clearinfo:hover {
+            filter: brightness(0.95);
+        }
+        button.delete {
+            background:rgb(220, 73, 53); 
+            color:white; 
+            margin-left: 10px;
+        }   
+        button.delete:hover {
+            filter: brightness(0.95);
+        }
+        h1 {
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            color: rgb(7, 88, 64);
+            font-size: large;
+
+        }
+        .student-entry {
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            color: rgb(7, 88, 64);
+            font-weight: bold;
+            font-size: 16px;
+            padding: 8px;
+            margin: 5px 0;
+        }
+    /* remove default bullet point for the student list */
+    #studentList {
+      list-style: none; /* no bullets */
+      margin: 0;        /* remove default left margin */
+      padding: 0;       /* remove default left padding */
+    }
+        input {
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            color: rgb(7, 88, 64);
+            background-color:rgb(218, 241, 228);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Input Student Information:</h1>
+  <input type="text" id="name" placeholder="First Name"><br>
+  <input type="text" id="lastname" placeholder="Last Name"><br>
+  <input type="text" id="age" placeholder="Age"><br>
+  <input type="text" id="email" placeholder="Email"><br><br>
+  <button onclick="student()" id="AddStudent">Add Student</button>
+  <button onclick="clearinfo()" id="Clearinfo">Clear Info</button>
+  <br>
+  <br>
+  <br><h1>Student List</h1>
+  
+  <p>First Name    Last Name     Age    Email</p>
+  <p id="studentInfo"></p>
+ 
+  
+
+<ul id="studentList"></ul>
+ <button onclick="clearlist()" id="Clearlist">Clear List</button>
+
+<script>
+  // load from storage or start empty
+  let students = JSON.parse(localStorage.getItem('students') || '[]');
+
+  const listEl = document.getElementById('studentList');
+  const addBtn = document.getElementById('addBtn');
+  const newStudent = document.getElementById('newStudent');
+  function student(){
+        var fname=document.getElementById("name").value;
+        var lname=document.getElementById("lastname").value;
+        var age=document.getElementById("age").value;
+        var email=document.getElementById("email").value;
+        if (fname=="" || lname=="" || age=="" || email==""){
+            alert("Please fill in all fields.");
+            return;
+        }
+        const studentInfo = `${fname}, ${lname}, ${age}, ${email}`;
+        students.push(studentInfo);
+        save();
+        render();
+        document.getElementById("name").value = "";
+        document.getElementById("lastname").value = "";
+        document.getElementById("age").value = "";
+        document.getElementById("email").value = "";
+    }
+    function clearinfo(){
+        document.getElementById("name").value = "";
+        document.getElementById("lastname").value = "";
+        document.getElementById("age").value = "";
+        document.getElementById("email").value = "";
+    }
+    function clearlist(){
+        students = [];
+        save();
+        render();
+        document.getElementById("name").value = "";
+        document.getElementById("lastname").value = "";
+        document.getElementById("age").value = "";
+        document.getElementById("email").value = "";
+    }
+
+  function save() {
+    localStorage.setItem('students', JSON.stringify(students));
+  }
+
+  // render the students array
+  function render() {
+    listEl.innerHTML = '';
+    students.forEach((s, i) => {
+      // include a data-index so we can identify which item to remove
+      const item = document.createElement('li');
+      item.className = 'student-entry';
+      item.innerHTML = `${escapeHtml(s)} <button class="delete" data-index="${i}">Delete</button>`;
+      listEl.appendChild(item);
+    });
+  }
+
+  // event delegation for delete buttons
+  listEl.addEventListener('click', (e) => {
+    if (e.target && e.target.matches('button.delete')) {
+      const index = Number(e.target.dataset.index);
+      // optional: confirm
+      if (!confirm(`Remove "${students[index]}"?`)) return;
+      // remove single item
+      students.splice(index, 1);
+      save();
+      render();
+    }
+  });
+
+  // initial render
+  render();
+
+  // simple HTML-escape helper
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+</script>
+</body>
+</html>

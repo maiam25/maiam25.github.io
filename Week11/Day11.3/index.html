@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    h1 {
+        color: rgb(3, 87, 59);
+    }
+    h2 {
+        color: rgb(12, 61, 89);
+    }
+</style>
 <body>
 <h1> Student Information</h1>
 <h2>Input Student Information</h2>
@@ -12,26 +20,28 @@
 <input type="text" id="lastBox" placeholder="Last Name"><br><br>
 <input type="text" id="ageBox" placeholder="Age">
 <input type="text" id="emailBox" placeholder="Email"><br><br>
-<button onclick="write()">Add Student</button>
+<button onclick="addStudent()">Add Student</button>
  
+<div id="output"></div>
 
-  <script>
+<script>
+    function addStudent()  { 
 
-let students =  { 
-    firstName: document.getElementById("nameBox").value, 
-    lastName: document.getElementById("lastBox").value, 
-    email: document.getElementById("emailBox").value, 
-    age: document.getElementById("ageBox").value 
-    
+    let students = {
+        firstName: document.getElementById("nameBox").value, 
+        lastName: document.getElementById("lastBox").value, 
+        email: document.getElementById("emailBox").value, 
+        age: document.getElementById("ageBox").value 
     }
-    let writing = `First Name: ${students.firstName}
-    Last Name: ${students.lastName}
-    Email: ${students.email}
+    
+    let writing = `First Name: ${students.firstName}<br>
+    Last Name: ${students.lastName}<br>
+    Email: ${students.email}<br>
     Age: ${students.age}`;
-    function write() {
-        document.write(document.getElementById("writing"));
-    }
-    
+
+
+        document.getElementById("output").innerHTML = writing;
+}    
 </script>  
 </body>
 </html>
