@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    SELECT *
+FROM students;
+2. Filter by grade
+SELECT *
+FROM students
+WHERE grade = 11;
+3. Order by average (highest first)
+SELECT first_name, last_name, grade, average
+FROM students
+ORDER BY average DESC;
+4. Only students with 80% or higher
+SELECT first_name, last_name, average
+FROM students
+WHERE average >= 80
+ORDER BY average DESC;
+5. Count students in each grade
+SELECT grade, COUNT(*) AS count
+FROM students
+GROUP BY grade
+ORDER BY grade;
+6. Average mark by grade
+SELECT grade, AVG(average) AS avg_mark
+FROM students
+GROUP BY grade
+ORDER BY grade;
+</body>
+</html>
+
