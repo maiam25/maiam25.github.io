@@ -166,26 +166,29 @@ ut Fields -->
             <input type="text" id="id" maxlength="35">
         </div>
         <div class="field">
-            <label>Song_Title</label>
-            <input type="text" id="title" maxlength="35">
+            <label>Skier Name</label>
+            <input type="text" id="skier_name" maxlength="35">
         </div>
         <div class="field">
-            <label>Artist</label>
-            <input type="text" id="artist" maxlength="35">
+            <label>Gender</label>
+            <input type="text" id="gender" maxlength="35">
+        </div>
+        <div class="Country">
+            <label>Country</label>
+            <input type="text" id="Country" maxlength="35">
         </div>
         <div class="field">
-            <label>Album</label>
-            <input type="text" id="album" maxlength="35">
+            <label>Skis on:</label>
+            <input type="text" id="skis_on" maxlength="35">
         </div>
         <div class="field">
-            <label>Adult</label>
-            <input type="text" id="adult" maxlength="35">
+            <label>Podiums</label>
+            <input type="text" id="podiums" maxlength="35">
         </div>
         <div class="field">
-            <label>Release_Year</label>
-            <input type="text" id="release_year" maxlength="35">
+            <label>Victories</label>
+            <input type="text" id="victories" maxlength="35">
         </div>
-
         <button id="createBtn" class="create-btn">Create New</button>
     </div>
 
@@ -194,10 +197,10 @@ ut Fields -->
         <label style="font-weight: bold; font-size: 16px; margin-bottom: 10px; display: block;">Example Queries:</label>
         <div class="example-buttons">
             <button class="example-btn" data-query='SELECT * FROM data'>1. SELECT * FROM data</button>
-            <button class="example-btn" data-query='SELECT "ID:" FROM data'>2. SELECT "ID:" FROM data</button>
+            <button class="example-btn" data-query='SELECT "Skier_Name:" FROM data'>2. SELECT "Skier_Name:" FROM data</button>
             <button class="example-btn" data-query='SELECT COUNT(*) as total_rows FROM data'>3. SELECT COUNT(*) as total_rows FROM data</button>
             <button class="example-btn" data-query='SELECT * FROM data LIMIT 5'>4. SELECT * FROM data LIMIT 5</button>
-            <button class="example-btn" data-query='SELECT "ID:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC'>5. SELECT "ID:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC</button>
+            <button class="example-btn" data-query='SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC'>5. SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC</button>
         </div>
     </div>
 
@@ -270,11 +273,12 @@ function parseCSV(text) {
 document.getElementById("createBtn").addEventListener("click", () => {
     const newEntry = {
         ID: document.getElementById("id").value,
-        Song_Title: document.getElementById("title").value,
-        Artist: document.getElementById("artist").value,
-        Album: document.getElementById("album").value,
-        Adult: document.getElementById("adult").value,
-        Release_Year: document.getElementById("release_year").value
+        Skier_Name: document.getElementById("skier_name").value,
+        Gender: document.getElementById("gender").value,
+        Country: document.getElementById("country").value,
+        Skis_on: document.getElementById("skis_on").value,
+        Podiums: document.getElementById("podiums").value,
+        Victories: document.getElementById("victories").value
     };
 
     currentData.push(newEntry);
@@ -282,11 +286,12 @@ document.getElementById("createBtn").addEventListener("click", () => {
     
     // Clear the form
     document.getElementById("id").value = '';
-    document.getElementById("title").value = '';
-    document.getElementById("artist").value = '';
-    document.getElementById("album").value = '';
-    document.getElementById("adult").value = '';
-    document.getElementById("release_year").value = '';
+    document.getElementById("skier_name").value = '';
+    document.getElementById("gender").value = '';
+    document.getElementById("country").value = '';
+    document.getElementById("skis_on").value = '';
+    document.getElementById("podiums").value = '';
+    document.getElementById("victories").value = '';
 });
 
 // ------------------------------
