@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Skier SQL Tool</title>
+
+    <!-- SQL engine for the browser -->
+    <script src="https://cdn.jsdelivr.net/npm/alasql@1.7/dist/alasql.min.js"></script>
+
+    <style>
+        body { font-family: Arial; background: #ddf7ff; padding: 20px; }
+        .box { padding: 10px; margin-top: 20px; }
+        textarea { width: 100%; height: 150px; padding: 10px; }
+        button { padding: 10px 20px; background: #4a7bff; color: white; border: none; cursor: pointer; }
+        input[type="text"] { padding: 5px; width: 300px; }
+    </style>
+</head>
+
+<body>
+
+<h2>Skier Data Manager (Simple Version)</h2>
+
+<!-- Upload Section -->
+<div class="box">
+    <p><strong>Upload CSV File</strong></p>
+    <input type="text" id="filename" readonly placeholder="No file selected">
+    <input type="file" id="fileInput" style="display:none">
+    <button id="chooseFile">Choose File</button>
+</div>
+
+<!-- SQL Input -->
+<div class="box">
+    <p><strong>Enter SQL</strong></p>
+    <textarea id="sqlInput" placeholder="Example: SELECT * FROM skiers"></textarea>
+    <button id="runSQL">Run SQL</button>
+</div>
+
+<!-- Output -->
+<div class="box">
+    <p><strong>Output</strong></p>
+    <textarea id="output" readonly></textarea>
+</div>
+
+<script>
+
+// --- SIMPLE FLAG to know if CSV was loaded ---
+let csvLoaded = false;
+
+// --- Select file button ---
+document.getElementById("chooseFile").onclick = function () {
+    document.getElementById("fileInput").click();
+};
+
+// --- When CSV chosen ---
+document.getElementById("fileInput").onchange = function (event) {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    document.getElementById("filename").value = file.name;
+
+    const reader = new FileReader();
+
+    // Read the file text
+    reader.onload = function (e) {
+        const csvData = e.target.result;
+
+        // Load CSV using AlaSQL
+        const rows = alasql("SELECT * FROM CSV(?, {headers:true, separator:'auto'})", [csvData]);
+
+        // Recreate table
+        alasql("DROP TABLE IF EXISTS skiers");
+        alasql("CREATE TABLE skiers");
+        alasql("INSERT INTO skiers SELECT * FROM ?", [rows]);
+
+        csvLoaded = true;
+
+        document.getElementById("output").value =
+            "CSV loaded! " + rows.length + " rows imported.";
+    };
+
+    reader.readAsText(file);
+};
+
+// --- Run SQL Button ---
+document.getElementById("runSQL").onclick = function () {
+
+    if (!csvLoaded) {
+        document.getElementById("output").value =
+            "ERROR: Upload a CSV file first.";
+        return;
+    }
+
+    const query = document.getElementById("sqlInput").value;
+
+    try {
+        const result = alasql(query);
+
+        document.getElementById("output").value =
+            "Query OK.\n\n" + JSON.stringify(result, null, 2);
+    }
+    catch (error) {
+        document.getElementById("output").value =
+            "SQL Error:\n" + error.message;
+    }
+};
+
+</script>
+
+</body>
+</html>

@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.5.1/alasql.min.js"></script>
     <title>Country Data Manager</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.5.1/alasql.min.js"></script>
 <style>
 body {
     background: rgb(223, 254, 255);
@@ -29,7 +28,10 @@ body {
     padding: 5px 10px;
     margin-left: 5px;
     background: rgb(82, 114, 218);
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana; ;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana;
 }
 
 .form-row {
@@ -51,6 +53,7 @@ body {
 
 .create-btn {
     background: rgb(82, 114, 218);
+    color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -66,23 +69,27 @@ body {
     width: 380px;
     height: 200px;
     padding: 10px;
-    border-color: rgb(52, 98, 185);
+    border: 2px solid rgb(52, 98, 185);
     background-color: rgb(240, 254, 255);
     border-radius: 15px;
+    font-family: monospace;
 }
 
 .output-box {
     width: 380px;
     height: 200px;
     padding: 10px;
-    border-color: rgb(52, 98, 185);
+    border: 2px solid rgb(52, 98, 185);
     background-color: rgb(240, 254, 255);
     border-radius: 15px;
+    font-family: monospace;
+    overflow: auto;
 }
 
 .run-btn {
     margin-top: 15px;
     background: rgb(82, 114, 218);
+    color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -97,7 +104,7 @@ body {
     <div class="import-section">
         <label class="import-title">Import File</label><br>
         <input type="text" id="filepath" class="file-text" readonly>
-        <input type="file" id="fileInput" style="display:none">
+        <input type="file" id="fileInput" style="display:none" accept=".csv">
         <button class="btn" id="browseBtn">Browse...</button>
     </div>
 
@@ -133,11 +140,13 @@ body {
 
     <!-- SQL Section -->
     <div class="sql-section">
-        <textarea id="sqlBox" class="sql-box" placeholder="Write SQL here..."></textarea>
+        <textarea id="sqlBox" class="sql-box" placeholder="Write SQL here... (e.g., SELECT * FROM skiers)"></textarea>
         <textarea id="outputBox" class="output-box" readonly placeholder="Output..."></textarea>
     </div>
 
     <button id="runBtn" class="run-btn">Run SQL</button>
+    <button id="top10Btn" class="run-btn">Top 10 Skiers by Victories</button>
+    <button id="mostPopularBtn" class="run-btn">Most Popular Ski</button>    
 </div>
 
 <script>
@@ -167,30 +176,55 @@ document.getElementById("fileInput").addEventListener("change", (event) => {
     reader.onload = function(e) {
         const csvText = e.target.result;
 
-        // Parse CSV → Convert into objects
-        const data = alasql(
-            "SELECT * FROM CSV(?, {headers:true, separator:'auto'})",
-            [csvText]
-        );
+        try {
+            // Parse CSV manually to handle it properly
+            const lines = csvText.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                document.getElementById("outputBox").value = "ERROR: CSV file is empty or invalid.";
+                return;
+            }
 
-        // Remove old table & create new one
-        alasql("DROP TABLE IF EXISTS skiers");
-        alasql("CREATE TABLE skiers");
+            // Get headers
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+           
+            // Parse data rows
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                data.push(row);
+            }
 
-        // Insert rows
-        alasql("INSERT INTO skiers SELECT * FROM ?", [data]);
+            // Drop existing table and create new one
+            alasql("DROP TABLE IF EXISTS skiers");
+            alasql("CREATE TABLE skiers");
 
-        skierTableLoaded = true;
+            // Insert rows one by one
+            data.forEach(row => {
+                alasql("INSERT INTO skiers VALUES ?", [row]);
+            });
 
-        document.getElementById("outputBox").value =
-            "CSV Loaded Successfully!\nRows Imported: " + data.length;
+            skierTableLoaded = true;
+
+            document.getElementById("outputBox").value =
+                "✓ CSV Loaded Successfully!\n" +
+                "Rows Imported: " + data.length + "\n" +
+                "Columns: " + headers.join(', ') + "\n\n" +
+                "Try: SELECT * FROM skiers";
+        } catch (err) {
+            document.getElementById("outputBox").value = "ERROR loading CSV:\n" + err.message;
+            skierTableLoaded = false;
+        }
     };
 
     reader.readAsText(file);
 });
 
 // ------------------------------
-// Create New Entry (alert only)
+// Create New Entry
 // ------------------------------
 document.getElementById("createBtn").addEventListener("click", () => {
     const data = {
@@ -202,7 +236,24 @@ document.getElementById("createBtn").addEventListener("click", () => {
         Victories: document.getElementById("victories").value
     };
 
-    alert("New Entry Created:\n\n" + JSON.stringify(data, null, 2));
+    if (skierTableLoaded) {
+        try {
+            alasql("INSERT INTO skiers VALUES ?", [data]);
+            alert("✓ New Entry Added to Database:\n\n" + JSON.stringify(data, null, 2));
+           
+            // Clear the form
+            document.getElementById("ID").value = '';
+            document.getElementById("skierName").value = '';
+            document.getElementById("gender").value = '';
+            document.getElementById("skisOn").value = '';
+            document.getElementById("podiums").value = '';
+            document.getElementById("victories").value = '';
+        } catch (err) {
+            alert("Error adding entry:\n" + err.message);
+        }
+    } else {
+        alert("Please load a CSV file first!");
+    }
 });
 
 // ------------------------------
@@ -212,18 +263,37 @@ document.getElementById("runBtn").addEventListener("click", () => {
     const sql = document.getElementById("sqlBox").value.trim();
     const outputBox = document.getElementById("outputBox");
 
+    if (!sql) {
+        outputBox.value = "Please enter an SQL query.";
+        return;
+    }
+
     if (!skierTableLoaded) {
-        outputBox.value = "ERROR: Upload a CSV first.";
+        outputBox.value = "ERROR: Please upload a CSV file first.";
         return;
     }
 
     try {
         const result = alasql(sql);
-        outputBox.value =
-            "Executed SQL:\n" + sql + "\n\n" +
-            JSON.stringify(result, null, 2);
+       
+        // Format the output nicely
+        let output = "✓ Query executed successfully!\n\n";
+        output += "SQL: " + sql + "\n\n";
+        output += "Results (" + (Array.isArray(result) ? result.length : 1) + " row(s)):\n";
+        output += "─────────────────────────────────\n\n";
+       
+        if (Array.isArray(result) && result.length > 0) {
+            // Display as formatted table
+            output += JSON.stringify(result, null, 2);
+        } else if (typeof result === 'number') {
+            output += "Affected rows: " + result;
+        } else {
+            output += JSON.stringify(result, null, 2);
+        }
+       
+        outputBox.value = output;
     } catch (err) {
-        outputBox.value = "SQL Error:\n" + err.message;
+        outputBox.value = "✗ SQL Error:\n\n" + err.message + "\n\nPlease check your SQL syntax.";
     }
 });
 </script>
