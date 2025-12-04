@@ -188,14 +188,20 @@ ut Fields -->
         <div class="field">
             <label>Victories</label>
             <input type="text" id="victories" maxlength="35">
+        </div>
+        <button id="createBtn" class="create-btn">Create New</button>
+    </div>
+
+    <!-- Example Queries -->
+    <div class="examples-section">
+        <label style="font-weight: bold; font-size: 16px; margin-bottom: 10px; display: block;">Example Queries:</label>
         <div class="example-buttons">
             <button class="example-btn" data-query='SELECT * FROM data'>1. SELECT * FROM data</button>
             <button class="example-btn" data-query='SELECT "Skier_Name:" FROM data'>2. SELECT "Skier_Name:" FROM data</button>
             <button class="example-btn" data-query='SELECT COUNT(*) as total_rows FROM data'>3. SELECT COUNT(*) as total_rows FROM data</button>
             <button class="example-btn" data-query='SELECT * FROM data LIMIT 5'>4. SELECT * FROM data LIMIT 5</button>
-            <button class="example-btn" data-query='SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "Skis_on:" ORDER BY count DESC'>5. SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "Skis_on:" ORDER BY count DESC</button>
+            <button class="example-btn" data-query='SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC'>5. SELECT "Skis_on:", COUNT(*) as count FROM data GROUP BY "ID:" ORDER BY count DESC</button>
         </div>
-
     </div>
 
     <!-- SQL Section -->
@@ -217,187 +223,221 @@ ut Fields -->
 
 <script>
 // ------------------------------
-// State
+// Database Storage
 // ------------------------------
 let currentData = [];
 
 // ------------------------------
-// File Browse & Import
+// File Browse Button & Import
 // ------------------------------
-document.getElementById('browseBtn').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
+document.getElementById("browseBtn").addEventListener("click", () => {
+    document.getElementById("fileInput").click();
 });
 
-document.getElementById('fileInput').addEventListener('change', async (event) => {
-    const file = event.target.files && event.target.files[0];
+document.getElementById("fileInput").addEventListener("change", async (event) => {
+    const file = event.target.files[0];
     if (!file) return;
-    document.getElementById('filepath').value = file.name;
+    
+    document.getElementById("filepath").value = file.name;
+    
+    // Read and parse the file (assuming CSV format)
     const text = await file.text();
     currentData = parseCSV(text);
+    
     alert(`File imported successfully! ${currentData.length} rows loaded.`);
 });
 
 function parseCSV(text) {
-    const lines = text.trim().split(/\r?\n/).filter(l => l.trim() !== '');
-    if (lines.length < 1) return [];
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
     const data = [];
+    
     for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
         const row = {};
         headers.forEach((header, index) => {
             row[header] = values[index] || '';
         });
         data.push(row);
     }
+    
     return data;
 }
 
-function parseCSVLine(line) {
-    const values = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-            inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-            values.push(current.trim());
-            current = '';
-        } else {
-            current += ch;
-        }
-    }
-    values.push(current.trim());
-    return values;
-}
 
 // ------------------------------
-// Create New Entry
+// Create New Button
 // ------------------------------
-document.getElementById('createBtn').addEventListener('click', () => {
-    const id = document.getElementById('id').value.trim();
-    const skierName = document.getElementById('skier_name').value.trim();
-    const gender = document.getElementById('gender').value.trim();
-    const country = document.getElementById('country').value.trim();
-    const skisOn = document.getElementById('skis_on').value.trim();
-    const podiums = document.getElementById('podiums').value.trim();
-    const victories = document.getElementById('victories').value.trim();
-
-    if (!id || !skierName) {
-        alert('Please fill at least ID and Skier Name.');
-        return;
-    }
-
-    // Create a default row with readable keys
+document.getElementById("createBtn").addEventListener("click", () => {
     const newEntry = {
-        'ID:': id,
-        'Skier_Name:': skierName,
-        'Gender:': gender,
-        'Country:': country,
-        'Skis_on:': skisOn,
-        'Podiums:': podiums,
-        'Victories:': victories
+        ID: document.getElementById("id").value,
+        Skier_Name: document.getElementById("skier_name").value,
+        Gender: document.getElementById("gender").value,
+        Country: document.getElementById("country").value,
+        Skis_on: document.getElementById("skis_on").value,
+        Podiums: document.getElementById("podiums").value,
+        Victories: document.getElementById("victories").value
     };
 
     currentData.push(newEntry);
-    alert('New Entry created.');
-    displayResults(currentData, document.getElementById('outputBox'));
-
-    // clear form
-    document.getElementById('id').value = '';
-    document.getElementById('skier_name').value = '';
-    document.getElementById('gender').value = '';
-    document.getElementById('country').value = '';
-    document.getElementById('skis_on').value = '';
-    document.getElementById('podiums').value = '';
-    document.getElementById('victories').value = '';
+    alert("New Entry Created and added to database!\n\n" + JSON.stringify(newEntry, null, 2));
+    
+    // Clear the form
+    document.getElementById("id").value = '';
+    document.getElementById("skier_name").value = '';
+    document.getElementById("gender").value = '';
+    document.getElementById("country").value = '';
+    document.getElementById("skis_on").value = '';
+    document.getElementById("podiums").value = '';
+    document.getElementById("victories").value = '';
 });
 
 // ------------------------------
-// Example queries
+// Example Query Buttons
 // ------------------------------
 document.querySelectorAll('.example-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.getElementById('sqlBox').value = btn.getAttribute('data-query');
+        const query = btn.getAttribute('data-query');
+        document.getElementById('sqlBox').value = query;
     });
 });
 
 // ------------------------------
-// Run SQL using AlaSQL (replace FROM data -> FROM ?)
+// Simple SQL Parser & Executor
 // ------------------------------
-document.getElementById('runBtn').addEventListener('click', () => {
-    const sql = document.getElementById('sqlBox').value.trim();
-    const outputBox = document.getElementById('outputBox');
-    if (!sql) return;
-    if (!currentData || currentData.length === 0) {
+document.getElementById("runBtn").addEventListener("click", () => {
+    const sql = document.getElementById("sqlBox").value.trim();
+    const outputBox = document.getElementById("outputBox");
+
+    if (currentData.length === 0) {
         outputBox.innerHTML = '<div style="color: red;">No data loaded. Please import a file first or create entries.</div>';
         return;
     }
 
     try {
-        // replace 'FROM data' (case-insensitive) with 'FROM ?' so we can pass the array
-        const prepared = sql.replace(/\bFROM\s+data\b/i, 'FROM ?');
-        const result = alasql(prepared, [currentData]);
+        const result = executeSQLQuery(sql, currentData);
         displayResults(result, outputBox);
-    } catch (err) {
-        outputBox.innerHTML = `<div style="color: red;">Error: ${err.message}</div>`;
+    } catch (error) {
+        outputBox.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
     }
 });
 
-// ------------------------------
-// Display results helper
-// ------------------------------
+function executeSQLQuery(sql, data) {
+    sql = sql.toUpperCase().replace(/\s+/g, ' ').trim();
+    
+    // Basic SELECT parser
+    if (!sql.startsWith('SELECT')) {
+        throw new Error('Only SELECT queries are supported');
+    }
+
+    let results = [...data];
+    
+    // Handle LIMIT
+    const limitMatch = sql.match(/LIMIT (\d+)/);
+    if (limitMatch) {
+        const limit = parseInt(limitMatch[1]);
+        results = results.slice(0, limit);
+        sql = sql.replace(/LIMIT \d+/, '').trim();
+    }
+
+    // Handle GROUP BY with COUNT
+    const groupByMatch = sql.match(/GROUP BY "?([^"]+)"?/i);
+    if (groupByMatch) {
+        const groupField = groupByMatch[1].replace(':', '').toLowerCase();
+        const countMatch = sql.match(/COUNT\(\*\)\s+AS\s+(\w+)/i);
+        const countAlias = countMatch ? countMatch[1] : 'count';
+        
+        const grouped = {};
+        results.forEach(row => {
+            const key = row[groupField] || row[Object.keys(row).find(k => k.toLowerCase() === groupField)];
+            grouped[key] = (grouped[key] || 0) + 1;
+        });
+        
+        results = Object.entries(grouped).map(([key, count]) => ({
+            [groupField]: key,
+            [countAlias]: count
+        }));
+        
+        // Handle ORDER BY
+        if (sql.includes('ORDER BY')) {
+            const orderMatch = sql.match(/ORDER BY (\w+)( DESC)?/i);
+            if (orderMatch) {
+                const orderField = orderMatch[1].toLowerCase();
+                const desc = orderMatch[2] !== undefined;
+                results.sort((a, b) => {
+                    const aVal = a[orderField];
+                    const bVal = b[orderField];
+                    return desc ? bVal - aVal : aVal - bVal;
+                });
+            }
+        }
+    }
+    // Handle COUNT(*) without GROUP BY
+    else if (sql.includes('COUNT(*)')) {
+        const countMatch = sql.match(/COUNT\(\*\)\s+AS\s+(\w+)/i);
+        const countAlias = countMatch ? countMatch[1] : 'count';
+        return [{ [countAlias]: results.length }];
+    }
+    // Handle SELECT specific columns
+    else if (!sql.includes('SELECT *')) {
+        const selectMatch = sql.match(/SELECT (.+?) FROM/i);
+        if (selectMatch) {
+            const columns = selectMatch[1].split(',').map(col => {
+                const cleaned = col.trim().replace(/"/g, '').replace(':', '');
+                return cleaned;
+            });
+            
+            results = results.map(row => {
+                const newRow = {};
+                columns.forEach(col => {
+                    const key = Object.keys(row).find(k => k.toLowerCase() === col.toLowerCase());
+                    if (key) {
+                        newRow[col] = row[key];
+                    }
+                });
+                return newRow;
+            });
+        }
+    }
+
+    return results;
+}
+
 function displayResults(results, container) {
     if (!results || results.length === 0) {
         container.innerHTML = '<div>No results found</div>';
         return;
     }
+
     const columns = Object.keys(results[0]);
+    
     let html = '<table class="query-results">';
-    html += '<thead><tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
-    html += '<tbody>' + results.map(r => '<tr>' + columns.map(c => `<td>${r[c] !== undefined ? r[c] : ''}</td>`).join('') + '</tr>').join('') + '</tbody>';
+    
+    // Header
+    html += '<thead><tr>';
+    columns.forEach(col => {
+        html += `<th>${col}</th>`;
+    });
+    html += '</tr></thead>';
+    
+    // Body
+    html += '<tbody>';
+    results.forEach(row => {
+        html += '<tr>';
+        columns.forEach(col => {
+            html += `<td>${row[col] !== undefined ? row[col] : ''}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody>';
+    
     html += '</table>';
+    
     container.innerHTML = html;
 }
 
-// ------------------------------
-// Clear output
-// ------------------------------
-document.getElementById('clearBtn').addEventListener('click', () => {
-    document.getElementById('outputBox').innerHTML = '<div class="output-placeholder">Output...</div>';
-});
-
-// ------------------------------
-// Save current data as CSV
-// ------------------------------
-document.getElementById('saveBtn').addEventListener('click', () => {
-    if (!currentData || currentData.length === 0) {
-        alert('No data to save. Please import a file or create entries first.');
-        return;
-    }
-    const headers = Object.keys(currentData[0]);
-    let csv = headers.join(',') + '\n';
-    currentData.forEach(row => {
-        const vals = headers.map(h => {
-            const v = row[h] || '';
-            return v.toString().includes(',') ? `"${v}"` : v;
-        });
-        csv += vals.join(',') + '\n';
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ski_racers_export.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    alert('CSV file saved successfully!');
-});
-</script>
-
-</body>
-</html>
 // ------------------------------
 // Clear Output Button
 // ------------------------------
