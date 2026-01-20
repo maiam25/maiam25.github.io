@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #87CEEB;
+            font-family: Arial, sans-serif;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+        canvas {
+            border: 3px solid #333;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+        #stats {
+            font-size: 20px;
+            margin: 10px;
+            color: #333;
+        }
+        #gameOver {
+            display: none;
+            font-size: 32px;
+            color: red;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="stats">
+            <div>Distance: <span id="score">0</span>m | Coins: <span id="coins">0</span> | Speed: <span id="speed">5</span></div>
+        </div>
+        <canvas id="game" width="400" height="600"></canvas>
+        <div id="gameOver">GAME OVER! Press Space to Restart</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        
+        let skier = { x: 200, y: 100, w: 25, h: 35, speed: 6 };
+        let trees = [];
+        let coins = [];
+        let distance = 0;
+        let coinCount = 0;
+        let gameActive = true;
+        let keys = {};
+        let scrollSpeed = 5;
+        let frame = 0;
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if (e.key === ' ' && !gameActive) {
+                resetGame();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        function resetGame() {
+            skier = { x: 200, y: 100, w: 25, h: 35, speed: 6 };
+            trees = [];
+            coins = [];
+            distance = 0;
+            coinCount = 0;
+            gameActive = true;
+            scrollSpeed = 5;
+            frame = 0;
+            document.getElementById('gameOver').style.display = 'none';
+            gameLoop();
+        }
+        
+        function createTree() {
+            const x = Math.random() * (canvas.width - 60) + 30;
+            trees.push({ x: x, y: canvas.height + 60, w: 50, h: 70 });
+        }
+        
+        function createCoin() {
+            const x = Math.random() * (canvas.width - 20) + 10;
+            coins.push({ x: x, y: canvas.height + 20, w: 18, h: 18 });
+        }
+        
+        function updateGame() {
+            if (!gameActive) return;
+            
+            frame++;
+            
+            // Increase scroll speed over time (speed up!)
+            scrollSpeed = 5 + (distance * 0.01);
+            
+            // Move skier left and right
+            if (keys['ArrowLeft'] && skier.x > 0) {
+                skier.x -= skier.speed;
+            }
+            if (keys['ArrowRight'] && skier.x < canvas.width - skier.w) {
+                skier.x += skier.speed;
+            }
+            
+            // Update distance (how far down the hill)
+            distance += scrollSpeed * 0.1;
+            
+            // Move trees up (simulating going downhill)
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].y -= scrollSpeed;
+                
+                // Remove trees that are off screen
+                if (trees[i].y < -70) {
+                    trees.splice(i, 1);
+                    continue;
+                }
+                
+                // Check collision with tree
+                if (skier.x < trees[i].x + trees[i].w - 10 &&
+                    skier.x + skier.w > trees[i].x + 10 &&
+                    skier.y < trees[i].y + trees[i].h - 10 &&
+                    skier.y + skier.h > trees[i].y + 10) {
+                    gameActive = false;
+                    document.getElementById('gameOver').style.display = 'block';
+                }
+            }
+            
+            // Move coins up
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].y -= scrollSpeed;
+                
+                // Remove coins that are off screen
+                if (coins[i].y < -20) {
+                    coins.splice(i, 1);
+                    continue;
+                }
+                
+                // Check collision with coin
+                if (skier.x < coins[i].x + coins[i].w &&
+                    skier.x + skier.w > coins[i].x &&
+                    skier.y < coins[i].y + coins[i].h &&
+                    skier.y + skier.h > coins[i].y) {
+                    coins.splice(i, 1);
+                    coinCount++;
+                }
+            }
+            
+            // Create new trees (more frequently as speed increases)
+            if (Math.random() < 0.04 + scrollSpeed * 0.002) {
+                createTree();
+            }
+            
+            // Create new coins
+            if (Math.random() < 0.02) {
+                createCoin();
+            }
+        }
+        
+        function drawGame() {
+            // Clear canvas with white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw ski tracks
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 5; i++) {
+                let offset = (frame * scrollSpeed * 0.5) % 100;
+                ctx.beginPath();
+                ctx.moveTo(50 + i * 80, canvas.height + offset);
+                ctx.lineTo(50 + i * 80, 0);
+                ctx.stroke();
+            }
+            
+            // Draw skier (as a triangle pointing down)
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(skier.x + skier.w / 2, skier.y + skier.h);
+            ctx.lineTo(skier.x, skier.y);
+            ctx.lineTo(skier.x + skier.w, skier.y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw trees (bigger!)
+            for (let tree of trees) {
+                // Tree top (larger triangle)
+                ctx.fillStyle = 'darkgreen';
+                ctx.beginPath();
+                ctx.moveTo(tree.x + tree.w / 2, tree.y);
+                ctx.lineTo(tree.x, tree.y + tree.h * 0.7);
+                ctx.lineTo(tree.x + tree.w, tree.y + tree.h * 0.7);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Tree trunk
+                ctx.fillStyle = 'brown';
+                ctx.fillRect(tree.x + tree.w / 2 - 6, tree.y + tree.h * 0.7, 12, tree.h * 0.3);
+            }
+            
+            // Draw coins
+            ctx.fillStyle = 'gold';
+            ctx.strokeStyle = 'orange';
+            ctx.lineWidth = 2;
+            for (let coin of coins) {
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.w / 2, coin.y + coin.h / 2, coin.w / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            // Update displays
+            document.getElementById('score').textContent = Math.floor(distance);
+            document.getElementById('coins').textContent = coinCount;
+            document.getElementById('speed').textContent = Math.floor(scrollSpeed);
+        }
+        
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            if (gameActive) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // Start game
+        gameLoop();
+    </script>
+</body>
+</html>

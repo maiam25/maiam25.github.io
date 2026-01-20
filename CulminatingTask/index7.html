@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #87ceeb 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #gameContainer {
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+        }
+        
+        .screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #4571bd 0%,  rgb(219, 250, 255) 100%);
+            padding: 50px 60px;
+            border-radius: 0px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            text-align: center;
+            z-index: 100;
+            width: 550px;
+        }
+        
+        .screen h1 {
+            color: #fff;
+            font-size: 56px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+        
+        .screen h2 {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .btn {
+            background: none;
+            color: white;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px;
+            display: inline-block;
+            background-image: url('button.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            background-image: url('button-hover.png');
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        .btn.freeski .btn-img {
+       background:none;
+    
+        }
+
+        .btn.freeski:hover .btn-img {
+         content: url("FreeSki2.png");
+        }
+
+        .btn.race .btn-img {
+       background:none;
+        }
+
+        .btn.race:hover .btn-img {
+         content: url("Race2.png");
+        }
+
+        .btn.easy .btn-img {
+       background:none;
+        }
+
+        .btn.easy:hover .btn-img {
+         content: url("easy2.png");
+        }
+        
+        .btn.medium .btn-img{
+            background: none;
+        }
+
+        .btn.medium:hover .btn-img {
+            content: url("Meduim2.png");
+        }
+        
+        .btn.hard {
+          background: none;
+        }
+
+        .btn.hard:hover .btn-img {
+            content: url("Hard2.png");
+        }
+          .btn.restart {
+          background: none;
+        }
+         .btn.restart:hover .btn-img {
+            content: url("restart2.png");
+        }
+          .btn.back {
+          background: none;
+        }
+         .btn.back:hover .btn-img {
+            content: url("back2.png");
+        }
+        
+        .btn.small {
+            padding: 15px 35px;
+            font-size: 20px;
+        }
+
+        .highscore-text {
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+            margin-left: 15px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .highscore-text span {
+            color: #FFD700;
+            font-size: 22px;
+        }
+        
+        #stats {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        #stats div {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #stats span {
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #gameOverScreen p {
+            color: #fff;
+            font-size: 28px;
+            margin: 20px 0;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <img src="skigame.png" width="300" height="440" alt="Ski Game Title">
+            <button class="btn freeski" onclick="showFreeSkiMenu()"><img src="FreeSki1.png" width="250" height="175" class="btn-img"></button>
+            <br>
+            <button class="btn race" onclick="showRaceMenu()"><img src="Race1.png" width="280" height="220" class="btn-img"></button>
+        </div>
+        
+        <!-- Free Ski Menu -->
+        <div id="freeSkiMenu" class="screen hidden">
+            <h1>Free Ski</h1>
+            <h2>Choose Difficulty</h2>
+            <div style="margin: 1px 0;">
+                <button class="btn easy" onclick="startFreeSki('easy')"><img src="Easy1.png" width="250" height="190" class="btn-img"></button>
+                <span class="highscore-text" style="color: #0d2b58;">Best: <span id="highscoreEasy" style="color: #174283;">0</span>m</span>
+            </div>
+            <div style="margin: 1px 0;">
+                <button class="btn medium" onclick="startFreeSki('medium')"><img src="Medium1.png" width="250" height="200" class="btn-img"></button>
+                <span class="highscore-text" style="color: #0d2b58;">Best: <span id="highscoreMedium" style="color: #174283;">0</span>m</span>
+            </div>
+            <div style="margin: 1px 0;">
+                <button class="btn hard" onclick="startFreeSki('hard')"><img src="Hard1.png" width="250" height="200" class="btn-img"></button>
+                <span class="highscore-text" style="color: #0d2b58;">Best: <span id="highscoreHard" style="color: #174283;">0</span>m</span>
+            </div>
+            <button class="btn back" onclick="backToMain()"><img src="back1.png" width="250" height="185"></button>
+        </div>
+        
+        <!-- Race Menu -->
+        <div id="raceMenu" class="screen hidden">
+            <h1>Race Mode</h1>
+            <h2>Choose Race Type</h2>
+            <button class="btn" onclick="startRace('gs')"><img src="GS1.png" width="250" height="175"></button>
+            <span class="highscore-text" style ="color:#0d2b58;" id="gsBestTime" style="display: none;" style="color: #174283;">Best: <span id="highscoreGS">--</span>s</span>
+            <br>
+            <button class="btn" onclick="startRace('slalom')"><img src="Slalom1.png" width="250" height="175"></button>
+            <span class="highscore-text"  style ="color:#0d2b58;" id="slalomBestTime" style="display: none;" style="color: #174283;">Best: <span id="highscoreSlalom">--</span>s</span>
+            <br>
+            <button class="btn back" onclick="backToMain()"><img src="back1.png" width="250" height="185"></button>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen hidden">
+            <img src="gameover.png" width="300" height="250" alt="Game Over">
+            <p id="gameOverMessage"></p>
+            <button class="btn" onclick="playAgain()"><img src="restart1.png" width="250" height="145"></button>
+            <button class="btn back" onclick="returnHome()"><img src="back1.png" width="250" height="185"></button>
+        </div>
+        
+        <div id="stats" class="hidden">
+            <div id="statsContent"></div>
+        </div>
+        <canvas id="game" width="500" height="700"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        
+        let gameMode = null;
+        let raceType = null;
+        let difficulty = null;
+        let skier = { x: 225, y: 120, w: 50, h: 70, speed: 7 };
+        let trees = [];
+        let coins = [];
+        let gates = [];
+        let distance = 0;
+        let coinCount = 0;
+        let time = 0;
+        let gameActive = false;
+        let keys = {};
+        let scrollSpeed = 5;
+        let frame = 0;
+        let gatesPassed = 0;
+        
+        const treeImg = new Image();
+        let useTreeImage = false;
+        treeImg.onload = function() { useTreeImage = true; };
+        treeImg.onerror = function() { useTreeImage = false; };
+        treeImg.src = "tree.png";
+        
+        const skierImg = new Image();
+        let useSkierImage = false;
+        skierImg.onload = function() { useSkierImage = true; };
+        skierImg.onerror = function() { useSkierImage = false; };
+        skierImg.src = "skier.png";
+        
+        const gateImages = {
+            slalom_blue: new Image(),
+            slalom_red: new Image(),
+            gs_blue: new Image(),
+            gs_red: new Image()
+        };
+        
+        let useGateImages = {
+            slalom_blue: false,
+            slalom_red: false,
+            gs_blue: false,
+            gs_red: false
+        };
+        
+        gateImages.slalom_blue.src = "BlueSlalom.png";
+        gateImages.slalom_red.src = "RedSlalom.png";
+        gateImages.gs_blue.src = "BlueGate.png";
+        gateImages.gs_red.src = "RedGate.png";
+        
+        gateImages.slalom_blue.onload = function() { useGateImages.slalom_blue = true; };
+        gateImages.slalom_red.onload = function() { useGateImages.slalom_red = true; };
+        gateImages.gs_blue.onload = function() { useGateImages.gs_blue = true; };
+        gateImages.gs_red.onload = function() { useGateImages.gs_red = true; };
+        
+        let highscores = {
+            easy: 0,
+            medium: 0,
+            hard: 0,
+            gs: Infinity,
+            slalom: Infinity
+        };
+        
+        if (localStorage.getItem('skiGameHighscores')) {
+            try {
+                highscores = JSON.parse(localStorage.getItem('skiGameHighscores'));
+                document.getElementById('highscoreEasy').textContent = highscores.easy || 0;
+                document.getElementById('highscoreMedium').textContent = highscores.medium || 0;
+                document.getElementById('highscoreHard').textContent = highscores.hard || 0;
+                
+                if (highscores.gs && highscores.gs !== Infinity) {
+                    document.getElementById('highscoreGS').textContent = highscores.gs.toFixed(2);
+                    document.getElementById('gsBestTime').style.display = 'inline-block';
+                }
+                if (highscores.slalom && highscores.slalom !== Infinity) {
+                    document.getElementById('highscoreSlalom').textContent = highscores.slalom.toFixed(2);
+                    document.getElementById('slalomBestTime').style.display = 'inline-block';
+                }
+            } catch(e) {
+                console.log('Error loading highscores');
+            }
+        }
+        
+        const difficulties = {
+            easy: { baseSpeed: 3, speedIncrease: 0.005, treeChance: 0.015, coinChance: 0.03 },
+            medium: { baseSpeed: 5, speedIncrease: 0.01, treeChance: 0.025, coinChance: 0.025 },
+            hard: { baseSpeed: 7, speedIncrease: 0.015, treeChance: 0.04, coinChance: 0.02 }
+        };
+        
+        const raceSettings = {
+            gs: { gateWidth: 150, gateSpacing: 200, offsetRange: 100, speed: 7, treeChance: 0 },
+            slalom: { gateWidth: 100, gateSpacing: 140, offsetRange: 130, speed: 6, treeChance: 0 }
+        };
+        
+        document.addEventListener('keydown', (e) => { keys[e.key] = true; });
+        document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        
+        function showFreeSkiMenu() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('freeSkiMenu').classList.remove('hidden');
+        }
+        
+        function showRaceMenu() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('raceMenu').classList.remove('hidden');
+        }
+        
+        function backToMain() {
+            document.getElementById('freeSkiMenu').classList.add('hidden');
+            document.getElementById('raceMenu').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+        }
+        
+        function startFreeSki(diff) {
+            gameMode = 'freeski';
+            difficulty = diff;
+            document.getElementById('freeSkiMenu').classList.add('hidden');
+            initGame();
+        }
+        
+        function startRace(type) {
+            gameMode = 'race';
+            raceType = type;
+            document.getElementById('raceMenu').classList.add('hidden');
+            initGame();
+        }
+        
+        function initGame() {
+            skier = { x: 225, y: 120, w: 50, h: 70, speed: 7 };
+            trees = [];
+            coins = [];
+            gates = [];
+            distance = 0;
+            coinCount = 0;
+            time = 0;
+            gameActive = true;
+            frame = 0;
+            gatesPassed = 0;
+            
+            if (gameMode === 'freeski') {
+                scrollSpeed = difficulties[difficulty].baseSpeed;
+            } else {
+                scrollSpeed = raceSettings[raceType].speed;
+            }
+            
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            
+            gameLoop();
+        }
+        
+        function endGame(message) {
+            gameActive = false;
+            
+            if (gameMode === 'freeski') {
+                const finalDistance = Math.floor(distance);
+                document.getElementById('gameOverMessage').innerHTML = 
+                    `Distance: ${finalDistance}m<br>Coins: ${coinCount}`;
+                
+                if (finalDistance > highscores[difficulty]) {
+                    highscores[difficulty] = finalDistance;
+                    localStorage.setItem('skiGameHighscores', JSON.stringify(highscores));
+                    document.getElementById('highscore' + difficulty.charAt(0).toUpperCase() + difficulty.slice(1)).textContent = finalDistance;
+                }
+            } else {
+                if (gatesPassed >= 20) {
+                    const finalTime = parseFloat(time.toFixed(2));
+                    if (highscores[raceType] === Infinity || finalTime < highscores[raceType]) {
+                        highscores[raceType] = finalTime;
+                        localStorage.setItem('skiGameHighscores', JSON.stringify(highscores));
+                        document.getElementById('highscore' + (raceType === 'gs' ? 'GS' : 'Slalom')).textContent = finalTime.toFixed(2);
+                        document.getElementById(raceType === 'gs' ? 'gsBestTime' : 'slalomBestTime').style.display = 'inline-block';
+                        document.getElementById('gameOverMessage').innerHTML = 
+                            `<span style="color: #FFD700;">🏆 NEW BEST TIME! 🏆</span><br>${message}`;
+                    } else {
+                        document.getElementById('gameOverMessage').innerHTML = message;
+                    }
+                } else {
+                    document.getElementById('gameOverMessage').innerHTML = message;
+                }
+            }
+            
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            document.getElementById('stats').classList.add('hidden');
+        }
+        
+        function playAgain() {
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            if (gameMode === 'freeski') {
+                startFreeSki(difficulty);
+            } else {
+                startRace(raceType);
+            }
+        }
+        
+        function returnHome() {
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+        }
+        
+        function createTree() {
+            const x = Math.random() * (canvas.width - 100) + 50;
+            trees.push({ x: x, y: canvas.height + 120, w: 90, h: 110 });
+        }
+        
+        function createCoin() {
+            const x = Math.random() * (canvas.width - 30) + 15;
+            coins.push({ x: x, y: canvas.height + 25, w: 22, h: 22 });
+        }
+        
+        function createGate() {
+            const settings = raceSettings[raceType];
+            const side = gates.length % 2 === 0 ? -1 : 1;
+            
+            const randomOffset = (Math.random() - 0.5) * 40;
+            const offset = (side * settings.offsetRange * (0.5 + Math.random() * 0.5)) + randomOffset;
+            const centerX = canvas.width / 2 + offset;
+            
+            gates.push({
+                x: centerX,
+                y: canvas.height + 50,
+                w: settings.gateWidth,
+                passed: false,
+                side: side
+            });
+        }
+        
+        function updateGame() {
+            if (!gameActive) return;
+            
+            frame++;
+            
+            if (gameMode === 'freeski') {
+                scrollSpeed = difficulties[difficulty].baseSpeed + (distance * difficulties[difficulty].speedIncrease);
+            }
+            
+            if (keys['ArrowLeft'] && skier.x > 0) {
+                skier.x -= skier.speed;
+            }
+            if (keys['ArrowRight'] && skier.x < canvas.width - skier.w) {
+                skier.x += skier.speed;
+            }
+            
+            distance += scrollSpeed * 0.1;
+            time += 1/60;
+            
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].y -= scrollSpeed;
+                
+                if (trees[i].y < -120) {
+                    trees.splice(i, 1);
+                    continue;
+                }
+                
+                if (skier.x < trees[i].x + trees[i].w - 25 &&
+                    skier.x + skier.w > trees[i].x + 25 &&
+                    skier.y < trees[i].y + trees[i].h - 25 &&
+                    skier.y + skier.h > trees[i].y + 25) {
+                    endGame(gameMode === 'freeski' ? 'Hit a tree!' : `Hit a tree!<br>Gates: ${gatesPassed}/20`);
+                    return;
+                }
+            }
+            
+            if (gameMode === 'freeski') {
+                for (let i = coins.length - 1; i >= 0; i--) {
+                    coins[i].y -= scrollSpeed;
+                    
+                    if (coins[i].y < -25) {
+                        coins.splice(i, 1);
+                        continue;
+                    }
+                    
+                    if (skier.x < coins[i].x + coins[i].w &&
+                        skier.x + skier.w > coins[i].x &&
+                        skier.y < coins[i].y + coins[i].h &&
+                        skier.y + skier.h > coins[i].y) {
+                        coins.splice(i, 1);
+                        coinCount++;
+                    }
+                }
+                
+                if (Math.random() < difficulties[difficulty].treeChance) createTree();
+                if (Math.random() < difficulties[difficulty].coinChance) createCoin();
+            }
+            
+            if (gameMode === 'race') {
+                if (Math.random() < raceSettings[raceType].treeChance) {
+                    createTree();
+                }
+                
+                for (let i = gates.length - 1; i >= 0; i--) {
+                    gates[i].y -= scrollSpeed;
+                    
+                    if (gates[i].y < -50 && !gates[i].passed) {
+                        endGame(`Missed Gate ${gatesPassed + 1}!<br>Time: ${time.toFixed(2)}s`);
+                        return;
+                    }
+                    
+                    if (!gates[i].passed && 
+                        skier.y < gates[i].y + 50 && 
+                        skier.y + skier.h > gates[i].y) {
+                        
+                        const skierCenter = skier.x + skier.w / 2;
+                        const gateLeft = gates[i].x - gates[i].w / 2;
+                        const gateRight = gates[i].x + gates[i].w / 2;
+                        
+                        if (skierCenter >= gateLeft && skierCenter <= gateRight) {
+                            gates[i].passed = true;
+                            gatesPassed++;
+                            
+                            if (gatesPassed >= 20) {
+                                endGame(`Race Complete!<br>Time: ${time.toFixed(2)}s<br>Great job!`);
+                                return;
+                            }
+                        }
+                    }
+                    
+                    if (gates[i].y < -100) {
+                        gates.splice(i, 1);
+                    }
+                }
+                
+                if (gates.length < 5 && gatesPassed < 20) {
+                    if (gates.length === 0 || canvas.height - gates[gates.length - 1].y > raceSettings[raceType].gateSpacing) {
+                        createGate();
+                    }
+                }
+            }
+        }
+        
+        function drawGame() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 6; i++) {
+                let offset = (frame * scrollSpeed * 0.5) % 120;
+                ctx.beginPath();
+                ctx.moveTo(60 + i * 90, canvas.height - offset);
+                ctx.lineTo(60 + i * 90, -offset);
+                ctx.stroke();
+            }
+            
+            if (useSkierImage && skierImg.complete) {
+                ctx.drawImage(skierImg, skier.x, skier.y, skier.w, skier.h);
+            } else {
+                ctx.fillStyle = '#ff3333';
+                ctx.strokeStyle = '#cc0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(skier.x + skier.w / 2, skier.y + skier.h);
+                ctx.lineTo(skier.x, skier.y);
+                ctx.lineTo(skier.x + skier.w, skier.y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            for (let tree of trees) {
+                if (useTreeImage && treeImg.complete) {
+                    ctx.drawImage(treeImg, tree.x, tree.y, tree.w, tree.h);
+                } else {
+                    ctx.fillStyle = '#0d4d4d';
+                    ctx.beginPath();
+                    ctx.moveTo(tree.x + tree.w / 2, tree.y);
+                    ctx.lineTo(tree.x, tree.y + tree.h * 0.7);
+                    ctx.lineTo(tree.x + tree.w, tree.y + tree.h * 0.7);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#b8d8e8';
+                    ctx.beginPath();
+                    ctx.moveTo(tree.x + tree.w / 2, tree.y + 5);
+                    ctx.lineTo(tree.x + 10, tree.y + tree.h * 0.5);
+                    ctx.lineTo(tree.x + tree.w - 10, tree.y + tree.h * 0.5);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#6b4423';
+                    ctx.fillRect(tree.x + tree.w / 2 - 8, tree.y + tree.h * 0.7, 16, tree.h * 0.3);
+                }
+            }
+            
+            if (gameMode === 'freeski') {
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = 3;
+                for (let coin of coins) {
+                    ctx.beginPath();
+                    ctx.arc(coin.x + coin.w / 2, coin.y + coin.h / 2, coin.w / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#FFA500';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('$', coin.x + coin.w / 2, coin.y + coin.h / 2 + 4);
+                    ctx.fillStyle = '#FFD700';
+                }
+            }
+            
+            if (gameMode === 'race') {
+                for (let gate of gates) {
+                    const leftPole = gate.x - gate.w / 2;
+                    const rightPole = gate.x + gate.w / 2;
+                    const isBlue = gate.side === 1;
+                    const gateKey = `${raceType}_${isBlue ? 'blue' : 'red'}`;
+                    
+                    const useImage = useGateImages[gateKey] && gateImages[gateKey].complete;
+                    
+                    if (useImage) {
+                        const imgWidth = 30;
+                        const imgHeight = 70;
+                        
+                        ctx.drawImage(gateImages[gateKey], leftPole - imgWidth/2, gate.y - 10, imgWidth, imgHeight);
+                        ctx.drawImage(gateImages[gateKey], rightPole - imgWidth/2, gate.y - 10, imgWidth, imgHeight);
+                    } else {
+                        const color = gate.passed ? '#00ff00' : (isBlue ? '#0000ff' : '#ff0000');
+                        
+                        ctx.fillStyle = color;
+                        ctx.fillRect(leftPole - 5, gate.y, 10, 50);
+                        ctx.beginPath();
+                        ctx.arc(leftPole, gate.y, 15, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.fillRect(rightPole - 5, gate.y, 10, 50);
+                        ctx.beginPath();
+                        ctx.arc(rightPole, gate.y, 15, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            if (gameMode === 'freeski') {
+                document.getElementById('statsContent').innerHTML = 
+                    `Distance: <span>${Math.floor(distance)}</span>m | Coins: <span>${coinCount}</span> | Speed: <span>${Math.floor(scrollSpeed)}</span>`;
+            } else {
+                document.getElementById('statsContent').innerHTML = 
+                    `Time: <span>${time.toFixed(2)}</span>s | Gates: <span>${gatesPassed}</span>/20 | Speed: <span>${Math.floor(scrollSpeed)}</span>`;
+            }
+        }
+        
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            if (gameActive) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #87ceeb 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #gameContainer {
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+        }
+        
+        #homeScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        #homeScreen h1 {
+            color: #fff;
+            font-size: 56px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+        
+        #startBtn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #startBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(245, 87, 108, 0.6);
+        }
+        
+        #startBtn:active {
+            transform: translateY(-1px);
+        }
+        
+        #stats {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        #stats div {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #stats span {
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="homeScreen">
+            <h1>⛷️ SKI GAME ⛷️</h1>
+            <button id="startBtn">Start Game</button>
+        </div>
+        <div id="stats" class="hidden">
+            <div>
+                Distance: <span id="score">0</span>m | 
+                Coins: <span id="coins">0</span> | 
+                Speed: <span id="speed">5</span>
+            </div>
+        </div>
+        <canvas id="game" width="500" height="700"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        
+        let skier = { x: 250, y: 120, w: 30, h: 40, speed: 7 };
+        let trees = [];
+        let coins = [];
+        let distance = 0;
+        let coinCount = 0;
+        let gameActive = false;
+        let keys = {};
+        let scrollSpeed = 5;
+        let frame = 0;
+        
+        // Load tree image
+        const treeImg = new Image();
+        treeImg.src = 'data:image/png;base64,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';
+        
+        // Start button event
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        function startGame() {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            
+            skier = { x: 250, y: 120, w: 30, h: 40, speed: 7 };
+            trees = [];
+            coins = [];
+            distance = 0;
+            coinCount = 0;
+            gameActive = true;
+            scrollSpeed = 5;
+            frame = 0;
+            
+            gameLoop();
+        }
+        
+        function endGame() {
+            gameActive = false;
+            document.getElementById('homeScreen').classList.remove('hidden');
+            document.getElementById('stats').classList.add('hidden');
+        }
+        
+        function createTree() {
+            const x = Math.random() * (canvas.width - 100) + 50;
+            trees.push({ x: x, y: canvas.height + 120, w: 90, h: 110 });
+        }
+        
+        function createCoin() {
+            const x = Math.random() * (canvas.width - 30) + 15;
+            coins.push({ x: x, y: canvas.height + 25, w: 22, h: 22 });
+        }
+        
+        function updateGame() {
+            if (!gameActive) return;
+            
+            frame++;
+            scrollSpeed = 5 + (distance * 0.015);
+            
+            if (keys['ArrowLeft'] && skier.x > 0) {
+                skier.x -= skier.speed;
+            }
+            if (keys['ArrowRight'] && skier.x < canvas.width - skier.w) {
+                skier.x += skier.speed;
+            }
+            
+            distance += scrollSpeed * 0.1;
+            
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].y -= scrollSpeed;
+                
+                if (trees[i].y < -120) {
+                    trees.splice(i, 1);
+                    continue;
+                }
+                
+                if (skier.x < trees[i].x + trees[i].w - 25 &&
+                    skier.x + skier.w > trees[i].x + 25 &&
+                    skier.y < trees[i].y + trees[i].h - 25 &&
+                    skier.y + skier.h > trees[i].y + 25) {
+                    endGame();
+                }
+            }
+            
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].y -= scrollSpeed;
+                
+                if (coins[i].y < -25) {
+                    coins.splice(i, 1);
+                    continue;
+                }
+                
+                if (skier.x < coins[i].x + coins[i].w &&
+                    skier.x + skier.w > coins[i].x &&
+                    skier.y < coins[i].y + coins[i].h &&
+                    skier.y + skier.h > coins[i].y) {
+                    coins.splice(i, 1);
+                    coinCount++;
+                }
+            }
+            
+            if (Math.random() < 0.035 + scrollSpeed * 0.002) {
+                createTree();
+            }
+            
+            if (Math.random() < 0.025) {
+                createCoin();
+            }
+        }
+        
+        function drawGame() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 6; i++) {
+                let offset = (frame * scrollSpeed * 0.5) % 120;
+                ctx.beginPath();
+                ctx.moveTo(60 + i * 90, canvas.height + offset);
+                ctx.lineTo(60 + i * 90, 0);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#ff3333';
+            ctx.strokeStyle = '#cc0000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(skier.x + skier.w / 2, skier.y + skier.h);
+            ctx.lineTo(skier.x, skier.y);
+            ctx.lineTo(skier.x + skier.w, skier.y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            for (let tree of trees) {
+                if (treeImg.complete) {
+                    ctx.drawImage(treeImg, tree.x, tree.y, tree.w, tree.h);
+                }
+            }
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.strokeStyle = '#FFA500';
+            ctx.lineWidth = 3;
+            for (let coin of coins) {
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.w / 2, coin.y + coin.h / 2, coin.w / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = '#FFA500';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('$', coin.x + coin.w / 2, coin.y + coin.h / 2 + 4);
+                ctx.fillStyle = '#FFD700';
+            }
+            
+            document.getElementById('score').textContent = Math.floor(distance);
+            document.getElementById('coins').textContent = coinCount;
+            document.getElementById('speed').textContent = Math.floor(scrollSpeed);
+        }
+        
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            if (gameActive) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+    </script>
+</body>
+</html>

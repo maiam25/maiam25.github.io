@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #87ceeb 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #gameContainer {
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+        }
+        
+        #homeScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        #homeScreen h1 {
+            color: #fff;
+            font-size: 56px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+        
+        #startBtn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #startBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(245, 87, 108, 0.6);
+        }
+        
+        #startBtn:active {
+            transform: translateY(-1px);
+        }
+        
+        #stats {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        #stats div {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #stats span {
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="homeScreen">
+            <h1>SKI GAME ⛷️</h1>
+            <button id="startBtn">Start Game</button>
+        </div>
+        <div id="stats" class="hidden">
+            <div>
+                Distance: <span id="score">0</span>m | 
+                Coins: <span id="coins">0</span> | 
+                Speed: <span id="speed">5</span>
+            </div>
+        </div>
+        <canvas id="game" width="500" height="700"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        
+        let skier = { x: 250, y: 120, w: 90, h: 110, speed: 7 };
+        let trees = [];
+        let coins = [];
+        let distance = 0;
+        let coinCount = 0;
+        let gameActive = false;
+        let keys = {};
+        let scrollSpeed = 5;
+        let frame = 0;
+        
+        // Create tree image (fallback to drawn trees)
+        const treeImg = new Image();
+        let useTreeImage = false;
+        
+        // Your custom tree image
+        treeImg.onload = function() {
+            useTreeImage = true;
+        };
+        treeImg.onerror = function() {
+            useTreeImage = false;
+        };
+        treeImg.src = "tree.png"; // Replace with your tree image path
+        
+        // Create skier image (fallback to drawn triangle)
+        const skierImg = new Image();
+        let useSkierImage = false;
+        
+        // Your custom skier image
+        skierImg.onload = function() {
+            useSkierImage = true;
+        };
+        skierImg.onerror = function() {
+            useSkierImage = false;
+        };
+        skierImg.src = "skier.png"; // Replace with your skier image path
+        
+        // Start button event
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        function startGame() {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            
+            skier = { x: 250, y: 120, w: 70, h: 80, speed: 7 };
+            trees = [];
+            coins = [];
+            distance = 0;
+            coinCount = 0;
+            gameActive = true;
+            scrollSpeed = 5;
+            frame = 0;
+            
+            gameLoop();
+        }
+        
+        function endGame() {
+            gameActive = false;
+            document.getElementById('homeScreen').classList.remove('hidden');
+            document.getElementById('stats').classList.add('hidden');
+        }
+        
+        function createTree() {
+            const x = Math.random() * (canvas.width - 100) + 50;
+            trees.push({ x: x, y: canvas.height + 120, w: 90, h: 110 });
+        }
+        
+        function createCoin() {
+            const x = Math.random() * (canvas.width - 30) + 15;
+            coins.push({ x: x, y: canvas.height + 25, w: 22, h: 22 });
+        }
+        
+        function updateGame() {
+            if (!gameActive) return;
+            
+            frame++;
+            scrollSpeed = 5 + (distance * 0.015);
+            
+            if (keys['ArrowLeft'] && skier.x > 0) {
+                skier.x -= skier.speed;
+            }
+            if (keys['ArrowRight'] && skier.x < canvas.width - skier.w) {
+                skier.x += skier.speed;
+            }
+            
+            distance += scrollSpeed * 0.1;
+            
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].y -= scrollSpeed;
+                
+                if (trees[i].y < -120) {
+                    trees.splice(i, 1);
+                    continue;
+                }
+                
+                if (skier.x < trees[i].x + trees[i].w - 25 &&
+                    skier.x + skier.w > trees[i].x + 25 &&
+                    skier.y < trees[i].y + trees[i].h - 25 &&
+                    skier.y + skier.h > trees[i].y + 25) {
+                    endGame();
+                }
+            }
+            
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].y -= scrollSpeed;
+                
+                if (coins[i].y < -25) {
+                    coins.splice(i, 1);
+                    continue;
+                }
+                
+                if (skier.x < coins[i].x + coins[i].w &&
+                    skier.x + skier.w > coins[i].x &&
+                    skier.y < coins[i].y + coins[i].h &&
+                    skier.y + skier.h > coins[i].y) {
+                    coins.splice(i, 1);
+                    coinCount++;
+                }
+            }
+            
+            if (Math.random() < 0.035 + scrollSpeed * 0.002) {
+                createTree();
+            }
+            
+            if (Math.random() < 0.025) {
+                createCoin();
+            }
+        }
+        
+        function drawGame() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 6; i++) {
+                let offset = (frame * scrollSpeed * 0.5) % 120;
+                ctx.beginPath();
+                ctx.moveTo(60 + i * 90, canvas.height + offset);
+                ctx.lineTo(60 + i * 90, 0);
+                ctx.stroke();
+            }
+            
+            // Draw skier
+            if (useSkierImage && skierImg.complete) {
+                ctx.drawImage(skierImg, skier.x, skier.y, skier.w, skier.h);
+            } else {
+                // Fallback: Draw red triangle
+                ctx.fillStyle = '#ff3333';
+                ctx.strokeStyle = '#cc0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(skier.x + skier.w / 2, skier.y + skier.h);
+                ctx.lineTo(skier.x, skier.y);
+                ctx.lineTo(skier.x + skier.w, skier.y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            for (let tree of trees) {
+                if (useTreeImage && treeImg.complete) {
+                    ctx.drawImage(treeImg, tree.x, tree.y, tree.w, tree.h);
+                } else {
+                    // Fallback: Draw snow-covered tree
+                    // Tree foliage (dark green)
+                    ctx.fillStyle = '#0d4d4d';
+                    ctx.beginPath();
+                    ctx.moveTo(tree.x + tree.w / 2, tree.y);
+                    ctx.lineTo(tree.x, tree.y + tree.h * 0.7);
+                    ctx.lineTo(tree.x + tree.w, tree.y + tree.h * 0.7);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Snow on tree (light blue/white)
+                    ctx.fillStyle = '#b8d8e8';
+                    ctx.beginPath();
+                    ctx.moveTo(tree.x + tree.w / 2, tree.y + 5);
+                    ctx.lineTo(tree.x + 10, tree.y + tree.h * 0.5);
+                    ctx.lineTo(tree.x + tree.w - 10, tree.y + tree.h * 0.5);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Tree trunk
+                    ctx.fillStyle = '#6b4423';
+                    ctx.fillRect(tree.x + tree.w / 2 - 8, tree.y + tree.h * 0.7, 16, tree.h * 0.3);
+                }
+            }
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.strokeStyle = '#FFA500';
+            ctx.lineWidth = 3;
+            for (let coin of coins) {
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.w / 2, coin.y + coin.h / 2, coin.w / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = '#FFA500';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('$', coin.x + coin.w / 2, coin.y + coin.h / 2 + 4);
+                ctx.fillStyle = '#FFD700';
+            }
+            
+            document.getElementById('score').textContent = Math.floor(distance);
+            document.getElementById('coins').textContent = coinCount;
+            document.getElementById('speed').textContent = Math.floor(scrollSpeed);
+        }
+        
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            if (gameActive) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+    </script>
+</body>
+</html>

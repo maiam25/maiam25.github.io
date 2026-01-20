@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #ffffff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #gameCanvas {
+            border: 2px solid #333;
+            background: white;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .highscore {
+            font-size: 14px;
+            color: #666;
+            margin-top: -5px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .game-over-text {
+            font-size: 24px;
+            color: #d32f2f;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen active">
+        <h1>SKI GAME</h1>
+        <img src="Start1.png" onclick="showScreen('modeScreen')" style="cursor: pointer; max-width: 200px;">
+    </div>
+
+    <!-- Mode Selection Screen -->
+    <div id="modeScreen" class="screen">
+        <h1>SELECT MODE</h1>
+        <img src="FreeSki1.png" onclick="showScreen('difficultyScreen')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+        <img src="Race1.png" onclick="showScreen('raceScreen')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="difficultyScreen" class="screen">
+        <h1>SELECT DIFFICULTY</h1>
+        <div>
+            <img src="Easy1.png" onclick="startFreeSki('easy')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+            <div class="highscore">High Score: <span id="easyScore">0</span>m</div>
+        </div>
+        <div>
+            <img src="Medium1.png" onclick="startFreeSki('medium')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+            <div class="highscore">High Score: <span id="mediumScore">0</span>m</div>
+        </div>
+        <div>
+            <img src="Hard1.png" onclick="startFreeSki('hard')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+            <div class="highscore">High Score: <span id="hardScore">0</span>m</div>
+        </div>
+        <img src="home.png" onclick="showScreen('homeScreen')" style="cursor: pointer; max-width: 150px; margin-top: 20px;">
+    </div>
+
+    <!-- Race Selection Screen -->
+    <div id="raceScreen" class="screen">
+        <h1>SELECT RACE TYPE</h1>
+        <img src="Slalom1.png" onclick="startRace('slalom')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+        <img src="GS1.png" onclick="startRace('giantSlalom')" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+        <img src="home.png" onclick="showScreen('homeScreen')" style="cursor: pointer; max-width: 150px; margin-top: 20px;">
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <div id="distanceDisplay" style="font-size: 20px; margin-bottom: 10px;">Distance: 0m</div>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen">
+        <div class="game-over-text">GAME OVER!</div>
+        <div id="finalScore" style="font-size: 20px; margin-bottom: 20px;"></div>
+        <img src="restart1.png" onclick="restartGame()" style="cursor: pointer; max-width: 200px; display: block; margin: 10px auto;">
+        <img src="home.png" onclick="showScreen('homeScreen')" style="cursor: pointer; max-width: 150px; margin: 10px auto;">
+    </div>
+
+    <script>
+        // Game variables
+        let canvas = document.getElementById('gameCanvas');
+        let ctx = canvas.getContext('2d');
+        let gameMode = '';
+        let difficulty = '';
+        let gameLoop;
+        let skier = { x: 200, y: 500, width: 30, height: 30 };
+        let obstacles = [];
+        let distance = 0;
+        let speed = 2;
+        let keys = {};
+        let highScores = { easy: 0, medium: 0, hard: 0 };
+
+        // Load images
+        let skierImg = new Image();
+        skierImg.src = 'skier.png';
+        let treeImg = new Image();
+        treeImg.src = 'tree.png';
+        let slalomGateImg = new Image();
+        slalomGateImg.src = 'RedSlalom.png';
+        let giantSlalomGateImg = new Image();
+        giantSlalomGateImg.src = 'RedGate.png';
+
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Start Free Ski mode
+        function startFreeSki(diff) {
+            gameMode = 'freeSki';
+            difficulty = diff;
+            initGame();
+        }
+
+        // Start Race mode
+        function startRace(type) {
+            gameMode = type;
+            initGame();
+        }
+
+        // Initialize game
+        function initGame() {
+            skier = { x: 185, y: 500, width: 30, height: 30 };
+            obstacles = [];
+            distance = 0;
+            
+            if (gameMode === 'freeSki') {
+                if (difficulty === 'easy') speed = 2;
+                else if (difficulty === 'medium') speed = 3.5;
+                else if (difficulty === 'hard') speed = 5;
+            } else {
+                speed = 3;
+            }
+            
+            showScreen('gameScreen');
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+            gameLoop = setInterval(updateGame, 1000 / 60);
+        }
+
+        // Handle keyboard
+        function handleKeyDown(e) {
+            keys[e.key] = true;
+        }
+
+        function handleKeyUp(e) {
+            keys[e.key] = false;
+        }
+
+        // Update game
+        function updateGame() {
+            // Move skier
+            if (keys['ArrowLeft'] && skier.x > 0) skier.x -= 5;
+            if (keys['ArrowRight'] && skier.x < canvas.width - skier.width) skier.x += 5;
+
+            // Move obstacles down
+            obstacles.forEach(obs => obs.y += speed);
+
+            // Remove off-screen obstacles
+            obstacles = obstacles.filter(obs => obs.y < canvas.height + 100);
+
+            // Add new obstacles
+            if (Math.random() < getObstacleFrequency()) {
+                addObstacle();
+            }
+
+            // Update distance
+            distance += speed / 10;
+            document.getElementById('distanceDisplay').textContent = 
+                gameMode === 'freeSki' ? `Distance: ${Math.floor(distance)}m` : '';
+
+            // Check collisions
+            checkCollisions();
+
+            // Draw everything
+            draw();
+        }
+
+        // Get obstacle frequency based on mode
+        function getObstacleFrequency() {
+            if (gameMode === 'freeSki') {
+                if (difficulty === 'easy') return 0.02;
+                if (difficulty === 'medium') return 0.035;
+                if (difficulty === 'hard') return 0.05;
+            } else {
+                return 0.015;
+            }
+        }
+
+        // Add obstacle
+        function addObstacle() {
+            if (gameMode === 'freeSki') {
+                obstacles.push({
+                    x: Math.random() * (canvas.width - 40),
+                    y: -50,
+                    width: 40,
+                    height: 40,
+                    type: 'tree'
+                });
+            } else if (gameMode === 'slalom') {
+                let side = Math.random() < 0.5 ? 'left' : 'right';
+                let color = obstacles.length % 2 === 0 ? 'red' : 'blue';
+                obstacles.push({
+                    x: side === 'left' ? 50 : canvas.width - 90,
+                    y: -100,
+                    width: 40,
+                    height: 10,
+                    type: 'slalom',
+                    side: side,
+                    color: color,
+                    passed: false
+                });
+            } else if (gameMode === 'giantSlalom') {
+                let side = Math.random() < 0.5 ? 'left' : 'right';
+                obstacles.push({
+                    x: side === 'left' ? 80 : canvas.width - 120,
+                    y: -150,
+                    width: 40,
+                    height: 60,
+                    type: 'giantSlalom',
+                    side: side,
+                    passed: false
+                });
+            }
+        }
+
+        // Check collisions
+        function checkCollisions() {
+            obstacles.forEach(obs => {
+                if (gameMode === 'freeSki') {
+                    if (skier.x < obs.x + obs.width &&
+                        skier.x + skier.width > obs.x &&
+                        skier.y < obs.y + obs.height &&
+                        skier.y + skier.height > obs.y) {
+                        endGame();
+                    }
+                } else {
+                    // Check if skier passed the gate correctly
+                    if (!obs.passed && obs.y > skier.y) {
+                        obs.passed = true;
+                        let gateCenter = obs.x + obs.width / 2;
+                        let skierCenter = skier.x + skier.width / 2;
+                        
+                        if (obs.side === 'left' && skierCenter < gateCenter + 100) {
+                            endGame();
+                        } else if (obs.side === 'right' && skierCenter > gateCenter - 100) {
+                            endGame();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Draw everything
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw obstacles
+            obstacles.forEach(obs => {
+                if (obs.type === 'tree') {
+                    ctx.drawImage(treeImg, obs.x, obs.y, obs.width, obs.height);
+                } else if (obs.type === 'slalom') {
+                    ctx.fillStyle = obs.color;
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                } else if (obs.type === 'giantSlalom') {
+                    ctx.fillStyle = '#ff9800';
+                    ctx.fillRect(obs.x, obs.y, 10, obs.height);
+                    ctx.fillRect(obs.x + 30, obs.y, 10, obs.height);
+                    ctx.fillRect(obs.x, obs.y + 25, 40, 10);
+                }
+            });
+
+            // Draw skier
+            ctx.drawImage(skierImg, skier.x, skier.y, skier.width, skier.height);
+        }
+
+        // End game
+        function endGame() {
+            clearInterval(gameLoop);
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+            
+            if (gameMode === 'freeSki') {
+                let score = Math.floor(distance);
+                if (score > highScores[difficulty]) {
+                    highScores[difficulty] = score;
+                    document.getElementById(difficulty + 'Score').textContent = score;
+                }
+                document.getElementById('finalScore').textContent = 
+                    `Your Score: ${score}m | High Score: ${highScores[difficulty]}m`;
+            } else {
+                document.getElementById('finalScore').textContent = 'You missed a gate!';
+            }
+            
+            showScreen('gameOverScreen');
+        }
+
+        // Restart game
+        function restartGame() {
+            if (gameMode === 'freeSki') {
+                startFreeSki(difficulty);
+            } else {
+                startRace(gameMode);
+            }
+        }
+    </script>
+</body>
+</html>
